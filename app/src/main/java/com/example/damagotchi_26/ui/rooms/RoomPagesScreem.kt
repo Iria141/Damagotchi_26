@@ -1,0 +1,103 @@
+package com.example.damagotchi_26.ui.rooms
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.example.damagotchi_26.viewmodel.PetViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RoomsPagerScreen(petViewModel: PetViewModel) {
+    val petEstado by petViewModel.pet.collectAsState()
+
+    val rooms = listOf("Salón", "Cocina", "Cuarto de Juegos", "Dormitorio", "Baño", "Consulta Médica", "Exterior")
+    val pagerState = rememberPagerState(pageCount = { rooms.size })
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        rooms[pagerState.currentPage],
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            // Indicador simple (puntitos)
+            RoomDots(
+                total = rooms.size,
+                current = pagerState.currentPage,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 8.dp)
+            )
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                when (page) {
+                    0 -> LivingRoom(
+                        pet = petEstado,
+                        comer = { petViewModel.alimentar() },
+                        jugar = { petViewModel.jugar() }
+                    )
+
+                    1 -> Kitchen(
+                        pet = petEstado,
+                        comer = { petViewModel.alimentar() },
+                        beber = { petViewModel.alimentar() }
+                    )
+
+                    2 -> GameRoom(
+                        pet = petEstado,
+                        onJugar = { petViewModel.jugar() }
+                    )
+
+                    3 -> BedRoom()
+                    4 -> BathRoom()
+                    5 -> Clinic()
+                    6 -> Park ()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RoomDots(total: Int, current: Int, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(total) { index ->
+            val selected = index == current
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .size(if (selected) 10.dp else 8.dp)
+            ) {
+                // usando Surface para puntito
+                Surface(
+                    shape = MaterialTheme.shapes.small,
+                    color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                    modifier = Modifier.fillMaxSize()
+                ) {}
+            }
+        }
+    }
+}
