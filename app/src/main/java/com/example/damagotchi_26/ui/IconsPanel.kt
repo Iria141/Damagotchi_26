@@ -33,8 +33,8 @@ fun IconsPanel(
 
     Box(
         modifier= Modifier
-            .background(Color.Blue)
             .fillMaxWidth()
+
     ) {
         Image(
             painter = painterResource(R.drawable.estado_inicial),
@@ -48,7 +48,6 @@ fun IconsPanel(
 
         Column(
             modifier = modifier.width(90.dp)
-                .background(Color.Yellow)
                 .padding(top = 100.dp)
                 .padding(bottom = 100.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
