@@ -16,6 +16,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.damagotchi_26.domain.Pet
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.example.damagotchi_26.R
 
@@ -29,48 +31,85 @@ fun IconsPanel(
 ) {
     var medidorActivo by remember { mutableStateOf<Medidor?>(null) }
 
-    Column(
-        modifier = modifier.width(90.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier= Modifier
+            .background(Color.Blue)
+            .fillMaxWidth()
     ) {
-
-        MedidorIcono(
-            icono = R.drawable.trueno,
-            valor = pet.energia,
-            activo = medidorActivo == Medidor.ENERGIA,
-            onToggle = {
-                medidorActivo = if (medidorActivo == Medidor.ENERGIA) null else Medidor.ENERGIA
-            }
+        Image(
+            painter = painterResource(R.drawable.estado_inicial),
+            contentDescription = "Personaje",
+            modifier = Modifier
+                .width(300.dp)
+                .height(400.dp)
+                .align(Alignment.Center)
+                .padding(start = 80.dp)
         )
 
-        MedidorIcono(
-            icono = R.drawable.comida,
-            valor = pet.hambre,
-            activo = medidorActivo == Medidor.HAMBRE,
-            onToggle = {
-                medidorActivo = if (medidorActivo == Medidor.HAMBRE) null else Medidor.HAMBRE
-            }
-        )
+        Column(
+            modifier = modifier.width(90.dp)
+                .background(Color.Yellow)
+                .padding(top = 100.dp)
+                .padding(bottom = 100.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        MedidorIcono(
-            icono = R.drawable.agua,
-            valor = pet.sed,
-            activo = medidorActivo == Medidor.SED,
-            onToggle = {
-                medidorActivo = if (medidorActivo == Medidor.SED) null else Medidor.SED
-            }
-        )
+            MedidorIcono(
+                icono = R.drawable.trueno,
+                valor = pet.energia,
+                activo = medidorActivo == Medidor.ENERGIA,
+                onToggle = {
+                    medidorActivo = if (medidorActivo == Medidor.ENERGIA) null else Medidor.ENERGIA
+                }
+            )
 
+            MedidorIcono(
+                icono = R.drawable.comida,
+                valor = pet.hambre,
+                activo = medidorActivo == Medidor.HAMBRE,
+                onToggle = {
+                    medidorActivo = if (medidorActivo == Medidor.HAMBRE) null else Medidor.HAMBRE
+                }
+            )
 
-        MedidorIcono(
-            icono = R.drawable.actividad,
-            valor = pet.actividad,
-            activo = medidorActivo == Medidor.ACTIVIDAD,
-            onToggle = {
-                medidorActivo = if (medidorActivo == Medidor.ACTIVIDAD) null else Medidor.ACTIVIDAD
-            }
-        )
+            MedidorIcono(
+                icono = R.drawable.agua,
+                valor = pet.sed,
+                activo = medidorActivo == Medidor.SED,
+                onToggle = {
+                    medidorActivo = if (medidorActivo == Medidor.SED) null else Medidor.SED
+                }
+            )
+
+            MedidorIcono(
+                icono = R.drawable.ducha,
+                valor = pet.limpieza,
+                activo = medidorActivo == Medidor.HIGIENE,
+                onToggle = {
+                    medidorActivo = if (medidorActivo == Medidor.HIGIENE) null else Medidor.HIGIENE
+                }
+            )
+
+            MedidorIcono(
+                icono = R.drawable.actividad,
+                valor = pet.actividad,
+                activo = medidorActivo == Medidor.ACTIVIDAD,
+                onToggle = {
+                    medidorActivo =
+                        if (medidorActivo == Medidor.ACTIVIDAD) null else Medidor.ACTIVIDAD
+                }
+            )
+
+            MedidorIcono(
+                icono = R.drawable.dormir,
+                valor = pet.descanso,
+                activo = medidorActivo == Medidor.SUEÑO,
+                onToggle = {
+                    medidorActivo = if (medidorActivo == Medidor.SUEÑO) null else Medidor.SUEÑO
+                }
+            )
+        }
     }
 }
 
@@ -86,11 +125,11 @@ private fun MedidorIcono(
             painter = painterResource(id = icono),
             contentDescription = null,
             modifier = Modifier
-                .size(30.dp)
+                .size(25.dp)
                 .clickable { onToggle() }
         )
         AnimatedVisibility(
-            visible = activo,
+            visible = activo, // Solo muestra el interior (barra porcentual) si visible = true
             enter = fadeIn(),
             exit = fadeOut()
         ) {
@@ -102,7 +141,7 @@ private fun MedidorIcono(
             ) {
                 Text("$valor%", style = MaterialTheme.typography.labelMedium)
                 LinearProgressIndicator(
-                    progress = valor / 100f,
+                    progress = {valor / 100f},
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)

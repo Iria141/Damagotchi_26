@@ -47,11 +47,11 @@ fun Kitchen(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        /*Text(
+                        Text(
                             text = "Sed actual: ${pet.sed}%",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
-                        ) */
+                        )
                     }
                 }
             )
@@ -83,7 +83,6 @@ fun Kitchen(
 
 
 
-            // Área derecha
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -93,17 +92,21 @@ fun Kitchen(
             ) {
 
 
-                // 🐾 CENTRO (pet grande)
+                // Personaje centrado
                 Box(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Green),
                     contentAlignment = Alignment.Center
-                ){               // 🐣 Pet
+
+                ){
                 Text(
                     text = if (pet.estaMal()) "🐣💧" else "🐣",
                     style = MaterialTheme.typography.displayLarge
-                )}
+                )
+                }
 
-                //PARTE INFERIOR (botones con acciones )
+                //botones con acciones
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(48.dp)
                 ) {
