@@ -40,17 +40,17 @@ fun IconsPanel(
             painter = painterResource(R.drawable.estado_inicial),
             contentDescription = "Personaje",
             modifier = Modifier
-                .width(300.dp)
-                .height(400.dp)
+                .width(400.dp)
+                .height(500.dp)
                 .align(Alignment.Center)
                 .padding(start = 80.dp)
         )
 
         Column(
-            modifier = modifier.width(90.dp)
-                .padding(top = 100.dp)
-                .padding(bottom = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = modifier
+                .width(90.dp)
+                .padding(vertical = 190.dp),
+            verticalArrangement = Arrangement.spacedBy(22.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -124,7 +124,7 @@ private fun MedidorIcono(
             painter = painterResource(id = icono),
             contentDescription = null,
             modifier = Modifier
-                .size(25.dp)
+                .size(30.dp)
                 .clickable { onToggle() }
         )
         AnimatedVisibility(

@@ -25,15 +25,16 @@ fun AppNavGraph(
 
             LivingRoom ( //Llamada a Salon
                 pet = petEstado,
-                comer = { navController.navigate(Routes.KITCHEN) },
-                jugar = { navController.navigate(Routes.GAMEROOM) }
+                comer = { petViewModel.alimentar() },
+                verTV = { petViewModel.dormir()},
+                leer = { petViewModel.jugar()},
             )
         }
 
         composable(Routes.KITCHEN) {
             val petEstado by petViewModel.pet.collectAsState()
 
-            Kitchen ( // Es la llamada a la pantalla  Kitchrn
+            Kitchen ( // Es la llamada a Kitchrn
                 pet = petEstado,
                 comer = { petViewModel.alimentar() },
                 beber = { petViewModel.alimentar() }

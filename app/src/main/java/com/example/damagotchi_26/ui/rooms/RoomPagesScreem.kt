@@ -1,5 +1,6 @@
 package com.example.damagotchi_26.ui.rooms
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -7,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.damagotchi_26.viewmodel.PetViewModel
@@ -20,20 +22,10 @@ fun RoomsPagerScreen(petViewModel: PetViewModel) {
     val pagerState = rememberPagerState(pageCount = { rooms.size })
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        rooms[pagerState.currentPage],
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            )
-        }
     ) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
+                .padding(top = 50.dp)
                 .fillMaxSize()
         ) {
             // Indicador simple (puntitos)
@@ -42,18 +34,19 @@ fun RoomsPagerScreen(petViewModel: PetViewModel) {
                 current = pagerState.currentPage,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 8.dp)
             )
 
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
             ) { page ->
                 when (page) {
                     0 -> LivingRoom(
                         pet = petEstado,
                         comer = { petViewModel.alimentar() },
-                        jugar = { petViewModel.jugar() }
+                        verTV = { petViewModel.dormir() },
+                        leer = { petViewModel.jugar() }
                     )
 
                     1 -> Kitchen(
