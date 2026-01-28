@@ -34,7 +34,7 @@ fun Kitchen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Salón",
+                            text = "Cocina",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.SemiBold,
                             lineHeight = 30.sp

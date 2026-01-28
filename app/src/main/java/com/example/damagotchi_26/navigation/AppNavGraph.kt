@@ -25,9 +25,9 @@ fun AppNavGraph(
 
             LivingRoom ( //Llamada a Salon
                 pet = petEstado,
-                comer = { petViewModel.alimentar() },
-                verTV = { petViewModel.dormir()},
-                leer = { petViewModel.jugar()},
+                beber = { petViewModel.hidratar() },
+                verTV = { petViewModel.verTV()},
+                leer = { petViewModel.leer()},
             )
         }
 
@@ -37,7 +37,7 @@ fun AppNavGraph(
             Kitchen ( // Es la llamada a Kitchrn
                 pet = petEstado,
                 comer = { petViewModel.alimentar() },
-                beber = { petViewModel.alimentar() }
+                beber = { petViewModel.hidratar() }
             )
         }
 

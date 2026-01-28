@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+
+//Hace que los medidores suban o bajen su porcentaje
 class PetViewModel(
     private val prefs: PetPrefs
 ) : ViewModel() {
@@ -34,7 +36,10 @@ class PetViewModel(
                 val actualizado = actual.copy(
                     hambre = limitar(actual.hambre - 2),
                     energia = limitar(actual.energia - 1),
-                    actividad = limitar(actual.actividad - 2)
+                    actividad = limitar(actual.actividad - 2),
+                    sed = limitar(actual.sed - 2),
+                    limpieza = limitar (actual.limpieza -1),
+                    descanso = limitar(actual.descanso - 2)
                 )
                 prefs.guardar(actualizado)
             }
@@ -44,9 +49,37 @@ class PetViewModel(
     fun alimentar() = actualizar { actual ->
         actual.copy(
             hambre = limitar(actual.hambre + 15),
-            actividad = limitar(actual.actividad - 2)
+            limpieza = limitar(actual.limpieza - 5),
+            actividad = limitar(actual.actividad - 2),
+            descanso = limitar(actual.descanso - 5)
         )
     }
+
+    fun hidratar() = actualizar { actual ->
+        actual.copy(
+            sed = limitar(actual.sed + 15),
+            hambre = limitar(actual.hambre + 5)
+        )
+    }
+
+    fun verTV() = actualizar { actual ->
+        actual.copy(
+            sed = limitar(actual.sed - 10),
+            hambre = limitar(actual.hambre - 5),
+            descanso = limitar(actual.descanso + 5),
+            actividad = limitar(actual.actividad -2)
+        )
+    }
+
+    fun leer() = actualizar { actual ->
+        actual.copy(
+            sed = limitar(actual.sed -10),
+            hambre = limitar(actual.hambre - 5),
+            descanso = limitar(actual.descanso + 5),
+            actividad = limitar(actual.actividad -2)
+        )
+    }
+
 
     fun dormir() = actualizar { actual ->
         actual.copy(

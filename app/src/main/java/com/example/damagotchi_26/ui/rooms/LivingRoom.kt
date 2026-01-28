@@ -24,15 +24,10 @@ import com.example.damagotchi_26.ui.theme.ActionButton
 @Composable
 fun LivingRoom(
     pet: Pet,
-    comer: () -> Unit,
+    beber: () -> Unit,
     verTV: () -> Unit,
     leer: () -> Unit
 ) {
-    val estado = when {
-        pet.estaKO() -> "😵 ¡Necesito ayuda ya!"
-        pet.estaMal() -> "😟 No me siento muy bien..."
-        else -> "😊 ¡Estoy genial!"
-    }
 
     Scaffold(
                 topBar = {
@@ -94,7 +89,7 @@ fun LivingRoom(
                 ActionButton(
                     image = R.drawable.botella_agua,
                     text = "Beber",
-                    onClick = comer,
+                    onClick = beber,
                 )
                 ActionButton(
                     image = R.drawable.tv,
