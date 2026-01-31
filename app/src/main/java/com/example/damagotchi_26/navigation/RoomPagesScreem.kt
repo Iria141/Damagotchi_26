@@ -1,6 +1,5 @@
-package com.example.damagotchi_26.ui.rooms
+package com.example.damagotchi_26.navigation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -8,9 +7,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.damagotchi_26.ui.rooms.BathRoom
+import com.example.damagotchi_26.ui.rooms.BedRoom
+import com.example.damagotchi_26.ui.rooms.Clinic
+import com.example.damagotchi_26.ui.rooms.GameRoom
+import com.example.damagotchi_26.ui.rooms.Kitchen
+import com.example.damagotchi_26.ui.rooms.LivingRoom
+import com.example.damagotchi_26.ui.rooms.Park
 import com.example.damagotchi_26.viewmodel.PetViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +70,7 @@ fun RoomsPagerScreen(petViewModel: PetViewModel) {
                     )
                     4 -> BathRoom()
                     5 -> Clinic()
-                    6 -> Park ()
+                    6 -> Park()
                 }
             }
         }
