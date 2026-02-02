@@ -70,8 +70,8 @@ fun RoomsPagerScreen(petViewModel: PetViewModel) {
                     )
 
                     4 -> BathRoom (
-//                        pet = petEstado,
-  //                      limpieza = { petViewModel.higiene()}
+                        pet = petEstado,
+                        limpieza = { petViewModel.higiene()}
                     )
 
                     5 -> Clinic()

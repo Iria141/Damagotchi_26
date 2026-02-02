@@ -93,8 +93,9 @@ class PetViewModel(
     fun higiene() = actualizar { actual ->
         actual.copy(
             energia = limitar(actual.energia + 10),
-            hambre = limitar(actual.hambre - 3)
-          //  limpieza = limitar (actual.limpieza + 15)
+            hambre = limitar(actual.hambre - 3),
+            limpieza = limitar (actual.limpieza + 15),
+            sed = limitar((actual.sed - 2))
         )
     }
 
