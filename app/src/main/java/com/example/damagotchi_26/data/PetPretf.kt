@@ -35,9 +35,9 @@ class PetPrefs(private val context: Context) {
             prefs[KEY_HAMBRE] = pet.hambre
             prefs[KEY_ENERGIA] = pet.energia
             prefs[KEY_DIVERSION] = pet.actividad
-            prefs[KEY_SED] = pet.actividad
-            prefs[KEY_DESCANSO] = pet.actividad
-            prefs[KEY_HIGIENE] = pet.actividad
+            prefs[KEY_SED] = pet.sed
+            prefs[KEY_DESCANSO] = pet.descanso
+            prefs[KEY_HIGIENE] = pet.limpieza
         }
     }
 }

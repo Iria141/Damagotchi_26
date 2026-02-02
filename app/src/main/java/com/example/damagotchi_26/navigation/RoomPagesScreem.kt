@@ -48,15 +48,15 @@ fun RoomsPagerScreen(petViewModel: PetViewModel) {
                 when (page) {
                     0 -> LivingRoom(
                         pet = petEstado,
-                        beber = { petViewModel.alimentar() },
-                        verTV = { petViewModel.dormir() },
-                        leer = { petViewModel.jugar() }
+                        beber = { petViewModel.hidratar() },
+                        verTV = { petViewModel.verTV() },
+                        leer = { petViewModel.leer() }
                     )
 
                     1 -> Kitchen(
                         pet = petEstado,
                         comer = { petViewModel.alimentar() },
-                        beber = { petViewModel.alimentar() }
+                        beber = { petViewModel.hidratar() }
                     )
 
                     2 -> GameRoom(
@@ -68,7 +68,12 @@ fun RoomsPagerScreen(petViewModel: PetViewModel) {
                         pet = petEstado,
                         dormir = { petViewModel.dormir() }
                     )
-                    4 -> BathRoom()
+
+                    4 -> BathRoom (
+//                        pet = petEstado,
+  //                      limpieza = { petViewModel.higiene()}
+                    )
+
                     5 -> Clinic()
                     6 -> Park()
                 }

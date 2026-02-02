@@ -49,9 +49,9 @@ class PetViewModel(
     fun alimentar() = actualizar { actual ->
         actual.copy(
             hambre = limitar(actual.hambre + 15),
-            limpieza = limitar(actual.limpieza - 5),
-            actividad = limitar(actual.actividad - 2),
-            descanso = limitar(actual.descanso - 5)
+            limpieza = limitar(actual.limpieza - 2),
+            actividad = limitar(actual.actividad - 1),
+            descanso = limitar(actual.descanso - 1)
         )
     }
 
@@ -64,29 +64,44 @@ class PetViewModel(
 
     fun verTV() = actualizar { actual ->
         actual.copy(
-            sed = limitar(actual.sed - 10),
-            hambre = limitar(actual.hambre - 5),
+            sed = limitar(actual.sed - 3),
+            hambre = limitar(actual.hambre - 2),
             descanso = limitar(actual.descanso + 5),
-            actividad = limitar(actual.actividad -2)
+            actividad = limitar(actual.actividad + 2)
         )
     }
 
     fun leer() = actualizar { actual ->
         actual.copy(
-            sed = limitar(actual.sed -10),
-            hambre = limitar(actual.hambre - 5),
+            sed = limitar(actual.sed - 3),
+            hambre = limitar(actual.hambre - 2),
             descanso = limitar(actual.descanso + 5),
-            actividad = limitar(actual.actividad -2)
+            actividad = limitar(actual.actividad + 5)
         )
     }
 
 
     fun dormir() = actualizar { actual ->
         actual.copy(
-            energia = limitar(actual.energia + 20),
-            hambre = limitar(actual.hambre - 5)
+            descanso = limitar(actual.descanso + 20),
+            energia = limitar(actual.energia + 10),
+            hambre = limitar(actual.hambre - 3),
+            sed = limitar(actual.sed - 3)
+            )
+    }
+
+    fun higiene() = actualizar { actual ->
+        actual.copy(
+            energia = limitar(actual.energia + 10),
+            hambre = limitar(actual.hambre - 3)
+          //  limpieza = limitar (actual.limpieza + 15)
         )
     }
+
+
+
+
+
 
     fun jugar() = actualizar { actual ->
         actual.copy(
@@ -95,6 +110,13 @@ class PetViewModel(
             hambre = limitar(actual.hambre - 4)
         )
     }
+
+
+
+
+
+
+
 
     private fun actualizar(bloque: (Pet) -> Pet) {
         viewModelScope.launch {

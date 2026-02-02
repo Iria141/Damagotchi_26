@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,7 +23,7 @@ import com.example.damagotchi_26.ui.theme.ActionButton
 @Composable
 fun BedRoom(
     pet: Pet,
-    dormir: () -> Unit,
+    dormir: () -> Unit , //Estos son los callbacks
 
 ) {
 
@@ -45,8 +44,8 @@ fun BedRoom(
                         )
 
                         Text(
-                            text = "Descanso: ${pet.descanso}%"
-                            ,
+                            text = "Descanso: ${pet.descanso}%    " +
+                            "|   Energía: ${pet.energia}%",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -85,8 +84,7 @@ fun BedRoom(
             ) {
                 ActionButton(
                     image = R.drawable.dormido,
-                    text = "" +
-                            "Dormir",
+                    text = "Dormir",
                     onClick = dormir
                 )
             }
