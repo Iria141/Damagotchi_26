@@ -74,8 +74,14 @@ fun RoomsPagerScreen(petViewModel: PetViewModel) {
                         limpieza = { petViewModel.higiene()}
                     )
 
-                    5 -> Clinic()
-                    6 -> Park()
+                    5 -> Park(
+                        pet = petEstado,
+                        caminar = {petViewModel.caminar()},
+                        yoga = {petViewModel.yoga()}
+                    )
+
+                    6 -> Clinic()
+
                 }
             }
         }

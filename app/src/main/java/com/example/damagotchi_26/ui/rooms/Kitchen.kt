@@ -43,7 +43,8 @@ fun Kitchen(
 
                         Text(
                             text = "Hambre: ${pet.hambre}%    " +
-                                    "|   Sed: ${pet.sed}%"
+                                    "|   Sed: ${pet.sed}%   "+
+                                    "|   Energía: ${pet.energia}%"
                             ,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant

@@ -95,7 +95,28 @@ class PetViewModel(
             energia = limitar(actual.energia + 10),
             hambre = limitar(actual.hambre - 3),
             limpieza = limitar (actual.limpieza + 15),
-            sed = limitar((actual.sed - 2))
+            sed = limitar(actual.sed - 2)
+        )
+    }
+
+    fun caminar() = actualizar { actual ->
+        actual.copy(
+            energia = limitar(actual.energia + 8),
+            hambre = limitar(actual.hambre - 10),
+            limpieza = limitar (actual.limpieza - 10),
+            sed = limitar(actual.sed - 10),
+            actividad = limitar(actual.actividad + 15)
+        )
+    }
+
+    fun yoga() = actualizar { actual ->
+        actual.copy(
+            energia = limitar(actual.energia + 8),
+            hambre = limitar(actual.hambre - 5),
+            limpieza = limitar (actual.limpieza + 8),
+            sed = limitar(actual.sed - 2),
+            actividad = limitar(actual.actividad + 15)
+
         )
     }
 

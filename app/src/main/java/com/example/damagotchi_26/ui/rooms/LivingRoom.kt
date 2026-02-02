@@ -48,7 +48,8 @@ fun LivingRoom(
                         Text(
                             text = "Sed: ${pet.sed}%    " +
                                     "|   Descanso: ${pet.descanso}%     " +
-                                    "|   Actividad: ${pet.actividad}%"
+                                    "|   Actividad: ${pet.actividad}%   "+
+                                    "|   Energía: ${pet.energia}%"
                             ,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
