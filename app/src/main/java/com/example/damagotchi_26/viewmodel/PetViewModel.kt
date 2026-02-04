@@ -2,6 +2,7 @@ package com.example.damagotchi_26.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.util.copy
 import com.example.damagotchi_26.data.PetPrefs
 import com.example.damagotchi_26.domain.Pet
 import com.example.damagotchi_26.domain.limitar
@@ -38,7 +39,7 @@ class PetViewModel(
                     energia = limitar(actual.energia - 1),
                     actividad = limitar(actual.actividad - 2),
                     sed = limitar(actual.sed - 2),
-                    limpieza = limitar (actual.limpieza -1),
+                    limpieza = limitar(actual.limpieza - 1),
                     descanso = limitar(actual.descanso - 2)
                 )
                 prefs.guardar(actualizado)
@@ -87,14 +88,14 @@ class PetViewModel(
             energia = limitar(actual.energia + 10),
             hambre = limitar(actual.hambre - 3),
             sed = limitar(actual.sed - 3)
-            )
+        )
     }
 
     fun higiene() = actualizar { actual ->
         actual.copy(
             energia = limitar(actual.energia + 10),
             hambre = limitar(actual.hambre - 3),
-            limpieza = limitar (actual.limpieza + 15),
+            limpieza = limitar(actual.limpieza + 15),
             sed = limitar(actual.sed - 2)
         )
     }
@@ -103,7 +104,7 @@ class PetViewModel(
         actual.copy(
             energia = limitar(actual.energia + 8),
             hambre = limitar(actual.hambre - 10),
-            limpieza = limitar (actual.limpieza - 10),
+            limpieza = limitar(actual.limpieza - 10),
             sed = limitar(actual.sed - 10),
             actividad = limitar(actual.actividad + 15)
         )
@@ -113,32 +114,18 @@ class PetViewModel(
         actual.copy(
             energia = limitar(actual.energia + 8),
             hambre = limitar(actual.hambre - 5),
-            limpieza = limitar (actual.limpieza + 8),
+            limpieza = limitar(actual.limpieza + 8),
             sed = limitar(actual.sed - 2),
             actividad = limitar(actual.actividad + 15)
 
         )
     }
 
-
-
-
-
-
-    fun jugar() = actualizar { actual ->
+    fun avanzarSemana() = actualizar { actual ->
         actual.copy(
-            actividad = limitar(actual.actividad + 18),
-            energia = limitar(actual.energia - 6),
-            hambre = limitar(actual.hambre - 4)
+            semanaEmbarazo = (actual.semanaEmbarazo + 1).coerceAtMost(40) //avanza una semana hasta llegar a 40
         )
     }
-
-
-
-
-
-
-
 
     private fun actualizar(bloque: (Pet) -> Pet) {
         viewModelScope.launch {
@@ -151,3 +138,4 @@ class PetViewModel(
         super.onCleared()
     }
 }
+

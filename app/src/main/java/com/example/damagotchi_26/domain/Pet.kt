@@ -7,6 +7,9 @@ data class Pet(
     val limpieza: Int = 100,
     val actividad: Int = 100,
     val descanso : Int = 100,
+
+    val semanaEmbarazo: Int = 1
+
 ) {
     fun estaMal(): Boolean =
         hambre <= 20 || energia <= 20 || actividad <= 20 || sed <= 20 || descanso <= 20 || limpieza <= 20

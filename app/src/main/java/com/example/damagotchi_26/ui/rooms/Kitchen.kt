@@ -97,15 +97,15 @@ fun Kitchen(
     }
 
 
-//SUPER IMPORTANTE POARA VER PANTALLA
+//PREVISUALIZACION
+
 @Preview(showBackground = true)
 @Composable
-fun MainKitchenScreem() {
+fun KitchenPreviewSimple() {
     Kitchen(
-        pet = TODO() ,
-        comer = TODO(),
-        beber = TODO()
+        pet = Pet(),   // todo a 100 por defecto
+        comer = {},
+        beber = {}
     )
-
 }
 

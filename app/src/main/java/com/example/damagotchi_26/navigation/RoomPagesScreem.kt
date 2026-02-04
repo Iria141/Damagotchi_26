@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import com.example.damagotchi_26.ui.rooms.BathRoom
 import com.example.damagotchi_26.ui.rooms.BedRoom
 import com.example.damagotchi_26.ui.rooms.Clinic
-import com.example.damagotchi_26.ui.rooms.GameRoom
 import com.example.damagotchi_26.ui.rooms.Kitchen
 import com.example.damagotchi_26.ui.rooms.LivingRoom
 import com.example.damagotchi_26.ui.rooms.Park
@@ -22,7 +21,7 @@ import com.example.damagotchi_26.viewmodel.PetViewModel
 fun RoomsPagerScreen(petViewModel: PetViewModel) {
     val petEstado by petViewModel.pet.collectAsState()
 
-    val rooms = listOf("Salón", "Cocina", "Cuarto de Juegos", "Dormitorio", "Baño", "Consulta Médica", "Exterior")
+    val rooms = listOf("Salón", "Cocina", "Dormitorio", "Baño", "Consulta Médica", "Parque")
     val pagerState = rememberPagerState(pageCount = { rooms.size })
 
     Scaffold(
@@ -59,28 +58,26 @@ fun RoomsPagerScreen(petViewModel: PetViewModel) {
                         beber = { petViewModel.hidratar() }
                     )
 
-                    2 -> GameRoom(
-                        pet = petEstado,
-                        onJugar = { petViewModel.jugar() }
-                    )
 
-                    3 -> BedRoom(
+                    2 -> BedRoom(
                         pet = petEstado,
                         dormir = { petViewModel.dormir() }
                     )
 
-                    4 -> BathRoom (
+                    3 -> BathRoom (
                         pet = petEstado,
                         limpieza = { petViewModel.higiene()}
                     )
 
-                    5 -> Park(
+                    4 -> Park(
                         pet = petEstado,
                         caminar = {petViewModel.caminar()},
                         yoga = {petViewModel.yoga()}
                     )
 
-                    6 -> Clinic()
+                    5 -> Clinic(
+                        pet = petEstado
+                    )
 
                 }
             }
@@ -102,7 +99,7 @@ private fun RoomDots(total: Int, current: Int, modifier: Modifier = Modifier) {
                     .padding(horizontal = 4.dp)
                     .size(if (selected) 10.dp else 8.dp)
             ) {
-                // usando Surface para puntito
+                // usando Surface para puntitos
                 Surface(
                     shape = MaterialTheme.shapes.small,
                     color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
