@@ -39,49 +39,48 @@ fun Clinic(
     pet: Pet
 ) {
 
-    val trimestreActual = trimestreDeSemana(pet.semanaEmbarazo)
-    val mensajesInicio = mensajesDeInicio(trimestreActual)
-    val listaRecordatorios = recordatoriosPorTrimestre(trimestreActual)
 
-    var mostrarOverlay by remember { mutableStateOf(false) }
-    var textoOverlay by remember { mutableStateOf("") }
-    var ultimoTrimestreMostrado by remember { mutableStateOf<Trimestre?>(null) }  //Para no repetir el overlay cada recomposición
 
+    val trimestreActual = trimestreDeSemana(pet.semanaEmbarazo) //devuelve el trimestre, por lo que dice que etapa esta el personaje
+    val mensajesInicio = mensajesDeInicio(trimestreActual) //Devuelve una lista de String (2 mesajes), uno de entrada al trimestre y otro como consejo.
+    val listaRecordatorios = recordatoriosPorTrimestre(trimestreActual) // devuelve la lista de consejos, que van rotando
+
+    var mostrarOverlay by remember { mutableStateOf(false) } //calcula si se muestra los mensajes de Inicio de Trimestre
+    var textoOverlay by remember { mutableStateOf("") } //Se guarda el mensaje que debe salir en el overlay
+    var ultimoTrimestreMostrado by remember { mutableStateOf<Trimestre?>(null) }  //Para no repetir el overlay  (mensajes Iniciales) en cada recomposición
 
     LaunchedEffect(trimestreActual) {
         // evita repetirlo siempre que se recompone
         if (ultimoTrimestreMostrado == trimestreActual) return@LaunchedEffect
-        ultimoTrimestreMostrado = trimestreActual
+        ultimoTrimestreMostrado = trimestreActual //actualiza el trimestre
 
-        // solo si hay mensajes para este trimestre
+        // si no hay mensajes de inicio definidos , no hace nada
         if (mensajesInicio.isEmpty()) return@LaunchedEffect
 
 
 
         for (m in mensajesInicio) {
-            textoOverlay = m
-            mostrarOverlay = true
+            textoOverlay = m //selecciona el taexto que se verá
+            mostrarOverlay = true // muestra el mensaje
             delay(2200)    // tiempo visible
-            mostrarOverlay = false
+            mostrarOverlay = false //oculgta el mensaje
             delay(600)    // tiempo fade-out + “mini pausa”
         }
     }
 
 
-//Hace que los mensajes sena aleatorios segun el trimestre
+//Hace que los mensajes sean aleatorios segun el trimestre
 
-    val lista = recordatoriosPorTrimestre(trimestreActual)
-    var idx by remember { mutableIntStateOf(0) }
+    var idx by remember(trimestreActual) { mutableIntStateOf(0) } //Indice del recordatorio actual
 
     LaunchedEffect(trimestreActual, listaRecordatorios.size) {
-
         idx = 0
         while (true) {
             delay(10000) // cada 10s cambia
-            idx = (idx + 1) % lista.size
+            idx = (idx + 1) % listaRecordatorios.size
         }
     }
-    val recordatorio = lista.getOrNull(idx)
+    val recordatorio = listaRecordatorios.getOrNull(idx) //Recordatorio equivalente al indice actual
 
 
     Scaffold(
@@ -129,8 +128,7 @@ fun Clinic(
 
             //Mensaje Recordatorio
 
-            val lista = recordatoriosPorTrimestre(trimestreActual)
-            val recordatorio = lista.firstOrNull()
+            val recordatorio = listaRecordatorios.getOrNull(idx) //caja de abajo rotará cada 10 segundos tal cual.
             if (recordatorio != null) {
 
                 Surface(
