@@ -90,7 +90,7 @@ fun LivingRoom(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-            NightOverlay(momento = momento, maxDarkness = 0.55f)
+            NightOverlay(momento = momento, maxDarkness = 0.55f) //Fondo oscurecido cuando "anochece"
 
 
             //Iconos izquierda

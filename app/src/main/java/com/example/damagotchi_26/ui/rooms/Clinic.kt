@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,8 +30,9 @@ import com.example.damagotchi_26.ui.theme.recordatoriosPorTrimestre
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.damagotchi_26.ui.components.NightOverlay
+import com.example.damagotchi_26.viewmodel.TransicionViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,8 +40,8 @@ import androidx.compose.runtime.setValue
 fun Clinic(
     pet: Pet
 ) {
-
-
+    val vm: TransicionViewModel = viewModel ()
+    val momento by vm.momentoDia.collectAsState()
 
     val trimestreActual = trimestreDeSemana(pet.semanaEmbarazo) //devuelve el trimestre, por lo que dice que etapa esta el personaje
     val mensajesInicio = mensajesDeInicio(trimestreActual) //Devuelve una lista de String (2 mesajes), uno de entrada al trimestre y otro como consejo.
@@ -121,6 +123,8 @@ fun Clinic(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+            NightOverlay(momento = momento, maxDarkness = 0.55f) //Fondo oscurecido cuando "anochece"
+
 
             //Iconos
             IconsPanel(pet = pet)

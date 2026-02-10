@@ -1,11 +1,12 @@
 package com.example.damagotchi_26.ui.rooms
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -14,10 +15,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.damagotchi_26.R
 import com.example.damagotchi_26.domain.Pet
 import com.example.damagotchi_26.ui.components.IconsPanel
+import com.example.damagotchi_26.ui.components.NightOverlay
 import com.example.damagotchi_26.ui.theme.ActionButton
+import com.example.damagotchi_26.viewmodel.TransicionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,6 +31,9 @@ fun Park(
     yoga: () -> Unit//Estos son los callbacks
 
 ) {
+
+    val vm: TransicionViewModel = viewModel ()
+    val momento by vm.momentoDia.collectAsState()
 
     Scaffold(
         topBar = {
@@ -68,6 +75,9 @@ fun Park(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+
+            NightOverlay(momento = momento, maxDarkness = 0.55f) //Fondo oscurecido cuando "anochece"
+
 
             //Iconos izquierda
             IconsPanel(pet = pet)
