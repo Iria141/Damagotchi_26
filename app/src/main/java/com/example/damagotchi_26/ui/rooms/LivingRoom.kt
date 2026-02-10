@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -19,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.damagotchi_26.R
 import com.example.damagotchi_26.domain.Pet
 import com.example.damagotchi_26.ui.components.IconsPanel
+import com.example.damagotchi_26.ui.components.NightOverlay
 import com.example.damagotchi_26.ui.theme.ActionButton
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 
@@ -33,6 +35,9 @@ fun LivingRoom(
 {
     val vm: TransicionViewModel = viewModel ()
     val momento by vm.momentoDia.collectAsState()
+    val dia by vm.diaActual.collectAsState()
+    val semana by vm.semanaActual.collectAsState()
+
 
     Scaffold(
                 topBar = {
@@ -42,7 +47,13 @@ fun LivingRoom(
                         modifier = Modifier
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+                    )
+                    {
+                        //COMPRUEBA EL DIA Y LA SEMANA y dia/noche
+                        Text("Día: ${dia}  Semana: ${semana} Momento:${momento.name}",
+                            style = MaterialTheme.typography.titleSmall,
+                            lineHeight = 15.sp)
+
                         Text(
                             text = "Salón",
                             style = MaterialTheme.typography.titleLarge,
@@ -60,8 +71,7 @@ fun LivingRoom(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
-                    //Text("Día: ${pet.diaEmbarazo}  Semana: ${pet.semanaEmbarazo}") //COMPRUEBA EL DIA Y LA SEMANA
-                  Text("Momento: ${momento.name}")
+
                     }
                 }
             )
@@ -80,10 +90,13 @@ fun LivingRoom(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+            NightOverlay(momento = momento, maxDarkness = 0.55f)
+
 
             //Iconos izquierda
             IconsPanel(pet = pet)
             Spacer(Modifier.width(12.dp))
+
 
             // 🔽 Acciones abajo
             Row(
@@ -114,5 +127,20 @@ fun LivingRoom(
         }
     }
 }
+
+//PREVISUALIZACION
+
+@Preview(showBackground = true)
+@Composable
+fun LivingRoomPreviewSimple() {
+    LivingRoom(
+        pet = Pet(),
+        beber = {},
+        verTV = {},
+        leer = {}
+
+    )
+}
+
 
 

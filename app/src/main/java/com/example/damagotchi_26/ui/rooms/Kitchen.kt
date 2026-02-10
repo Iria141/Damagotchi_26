@@ -91,6 +91,7 @@ fun Kitchen(
                         text = "Beber",
                         onClick = beber,
                     )
+
                 }
             }
         }
