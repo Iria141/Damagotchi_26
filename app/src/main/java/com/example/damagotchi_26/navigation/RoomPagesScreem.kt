@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.damagotchi_26.domain.MomentoDia
 import com.example.damagotchi_26.ui.rooms.BathRoom
 import com.example.damagotchi_26.ui.rooms.BedRoom
 import com.example.damagotchi_26.ui.rooms.Clinic
@@ -15,10 +16,11 @@ import com.example.damagotchi_26.ui.rooms.Kitchen
 import com.example.damagotchi_26.ui.rooms.LivingRoom
 import com.example.damagotchi_26.ui.rooms.Park
 import com.example.damagotchi_26.viewmodel.PetViewModel
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoomsPagerScreen(petViewModel: PetViewModel) {
+fun RoomsPagerScreen(petViewModel: PetViewModel, momentoDia: StateFlow<MomentoDia>) {
     val petEstado by petViewModel.pet.collectAsState()
 
     val rooms = listOf("Salón", "Cocina", "Dormitorio", "Baño", "Consulta Médica", "Parque")

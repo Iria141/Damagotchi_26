@@ -8,7 +8,9 @@ data class Pet(
     val actividad: Int = 100,
     val descanso : Int = 100,
 
-    val semanaEmbarazo: Int = 1
+    val semanaEmbarazo: Int = 1, //1..200
+    val diaEmbarazo: Int = 1 //1..40
+
 
 ) {
     fun estaMal(): Boolean =
