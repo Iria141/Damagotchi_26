@@ -35,12 +35,39 @@ fun RoomsPagerScreen(transicionViewModel: TransicionViewModel, petViewModel: Pet
 
     LaunchedEffect(Unit) {
         transicionViewModel.avisos.collect { msg ->
-            snackbarHostState.showSnackbar(msg)
+            val result = snackbarHostState.showSnackbar(
+                message = msg,
+                duration = SnackbarDuration.Long
+            )
         }
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = {
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .padding(bottom = 10.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                SnackbarHost(
+                    hostState = snackbarHostState
+                ) { data ->
+                    Surface(
+                        tonalElevation = 4.dp,
+                        shadowElevation = 8.dp,
+                        shape = MaterialTheme.shapes.extraLarge,
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+                    ) {
+                        Text(
+                            text = data.visuals.message,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+        }
     ) { padding ->
 
         Column(
