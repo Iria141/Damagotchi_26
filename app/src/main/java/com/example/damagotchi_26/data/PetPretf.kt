@@ -1,6 +1,8 @@
 package com.example.damagotchi_26.data
 
+import kotlinx.coroutines.flow.first
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -18,6 +20,10 @@ class PetPrefs(private val context: Context) {
     private val KEY_SED = intPreferencesKey("sed")
     private val KEY_DESCANSO = intPreferencesKey("dormir")
     private val KEY_HIGIENE = intPreferencesKey("limpieza")
+    private val AVISO_T1 = booleanPreferencesKey("aviso_trimestre_1")
+    private val AVISO_T2 = booleanPreferencesKey("aviso_trimestre_14")
+    private val AVISO_T3 = booleanPreferencesKey("aviso_trimestre_28")
+
 
     val petFlow: Flow<Pet> = context.dataStore.data.map { prefs ->
         Pet(
@@ -40,4 +46,28 @@ class PetPrefs(private val context: Context) {
             prefs[KEY_HIGIENE] = pet.limpieza
         }
     }
+
+    suspend fun yaMostradoAviso(umbral: Int): Boolean {
+        val key = when (umbral) {
+            1 -> AVISO_T1
+            14 -> AVISO_T2
+            28 -> AVISO_T3
+            else -> return true
+        }
+        return context.dataStore.data.first()[key] ?: false
+    }
+
+    suspend fun marcarAvisoMostrado(umbral: Int) {
+        val key = when (umbral) {
+            1 -> AVISO_T1
+            14 -> AVISO_T2
+            28 -> AVISO_T3
+            else -> return
+        }
+        context.dataStore.edit { prefs ->
+            prefs[key] = true
+        }
+    }
+
+
 }

@@ -16,18 +16,33 @@ import com.example.damagotchi_26.ui.rooms.Kitchen
 import com.example.damagotchi_26.ui.rooms.LivingRoom
 import com.example.damagotchi_26.ui.rooms.Park
 import com.example.damagotchi_26.viewmodel.PetViewModel
+import com.example.damagotchi_26.viewmodel.TransicionViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoomsPagerScreen(petViewModel: PetViewModel, momentoDia: StateFlow<MomentoDia>) {
+fun RoomsPagerScreen(transicionViewModel: TransicionViewModel, petViewModel: PetViewModel, momentoDia: StateFlow<MomentoDia>) {
     val petEstado by petViewModel.pet.collectAsState()
 
-    val rooms = listOf("Salón", "Cocina", "Dormitorio", "Baño", "Consulta Médica", "Parque")
+    val rooms = listOf("Salón", "Cocina", "Dormitorio", "Baño", "Parque", "Consulta Médica")
     val pagerState = rememberPagerState(pageCount = { rooms.size })
 
+    LaunchedEffect(petEstado.semanaEmbarazo) {
+        transicionViewModel.comprobarAvisoTrimestre(petEstado.semanaEmbarazo)
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        transicionViewModel.avisos.collect { msg ->
+            snackbarHostState.showSnackbar(msg)
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .padding(top = 50.dp)
