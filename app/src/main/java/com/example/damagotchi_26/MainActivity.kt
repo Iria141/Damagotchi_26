@@ -4,10 +4,13 @@ import com.example.damagotchi_26.viewmodel.TransicionViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.damagotchi_26.data.PetPrefs
+import com.example.damagotchi_26.navigation.AppNav
 import com.example.damagotchi_26.viewmodel.PetViewModel
 import com.example.damagotchi_26.navigation.RoomsPagerScreen
 import com.example.damagotchi_26.viewmodel.PetViewModelFactory
@@ -29,17 +32,22 @@ class MainActivity : ComponentActivity() {
             val transFactory = remember { TransicionViewModelFactory(petPrefs) }
             val transicionViewModel: TransicionViewModel = viewModel(factory = transFactory)
 
+
             LaunchedEffect(Unit) {
                 petViewModel.iniciarTick()
                 petViewModel.iniciarTiempo()
                 transicionViewModel.iniciarCicloLuz()
             }
 
-            RoomsPagerScreen(
-                transicionViewModel = transicionViewModel,
-                petViewModel = petViewModel,
-                momentoDia = transicionViewModel.momentoDia
-            )
+            MaterialTheme {
+                Surface {
+                    AppNav(
+                        transicionViewModel = transicionViewModel,
+                        petViewModel = petViewModel,
+                        momentoDia = transicionViewModel.momentoDia
+                    )
+                }
+            }
         }
     }
 }
