@@ -10,13 +10,13 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.damagotchi_26.ui.components.AuthBackground
 import com.example.damagotchi_26.ui.components.AuthCard
 import com.example.damagotchi_26.ui.components.PrimaryAuthButton
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
 
 @Composable
 fun NewUser(
@@ -32,7 +32,8 @@ fun NewUser(
 
     AuthBackground {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center
         ) {
             AuthCard {

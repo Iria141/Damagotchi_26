@@ -15,14 +15,29 @@ import com.example.damagotchi_26.viewmodel.PetViewModel
 import com.example.damagotchi_26.navigation.RoomsPagerScreen
 import com.example.damagotchi_26.viewmodel.PetViewModelFactory
 import com.example.damagotchi_26.viewmodel.TransicionViewModelFactory
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import com.example.damagotchi_26.data.UserPreferences
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            //prefs: 1 sola instancia
-            val petPrefs = remember { PetPrefs(applicationContext) }
+            val petPrefs = remember { PetPrefs(applicationContext) } //prefs del juego
+            val userPrefs = remember { UserPreferences(applicationContext) } //prefs del login
+            val rememberMe by userPrefs.rememberMeFlow.collectAsState(initial = false)
+
+            val start = if (rememberMe) {
+                com.example.damagotchi_26.navigation.Route.Rooms.path
+            } else {
+                com.example.damagotchi_26.navigation.Route.Login.path
+            }
+
+            val scope = rememberCoroutineScope()
+
 
             //PetViewModel
             val petFactory = remember { PetViewModelFactory(applicationContext) }
@@ -42,12 +57,18 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 Surface {
                     AppNav(
+                        startDestination = start,
                         transicionViewModel = transicionViewModel,
                         petViewModel = petViewModel,
-                        momentoDia = transicionViewModel.momentoDia
+                        momentoDia = transicionViewModel.momentoDia,
+                        onRememberMeChanged = { value ->
+                            userPrefs.setRememberMe(value)
+
+                        }
                     )
                 }
             }
         }
     }
 }
+

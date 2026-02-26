@@ -1,6 +1,7 @@
 package com.example.damagotchi_26.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -9,6 +10,7 @@ import com.example.damagotchi_26.ui.login.Login
 import com.example.damagotchi_26.viewmodel.PetViewModel
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 
 sealed class Route(val path: String) {
@@ -22,11 +24,16 @@ sealed class Route(val path: String) {
 
 @Composable
 fun AppNav(
+    startDestination:String,
     transicionViewModel: TransicionViewModel,
     petViewModel: PetViewModel,
-    momentoDia: StateFlow<MomentoDia>
+    momentoDia: StateFlow<MomentoDia>,
+    onRememberMeChanged: suspend (Boolean) -> Unit
 ) {
     val navController = rememberNavController()
+    val scope = rememberCoroutineScope ()
+
+
 
     NavHost(
         navController = navController,
@@ -34,13 +41,17 @@ fun AppNav(
     ) {
         composable(Route.Login.path) {
             Login(
-                onLogin = { _, _ ->
+                onLogin = { user, pass, remember ->
+                    scope.launch {
+                        scope.launch { onRememberMeChanged(remember) }
+                    }
                     navController.navigate(Route.Rooms.path) {
                         popUpTo(Route.Login.path) { inclusive = true }
                     }
                 },
                 onGoRegister = { navController.navigate(Route.Register.path) },
                 onForgotPassword = { navController.navigate(Route.ResetPassword.path) }
+
             )
         }
 

@@ -7,9 +7,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.damagotchi_26.ui.Color.Color.BorderGray
 import com.example.damagotchi_26.ui.Color.Color.CardGray
 import com.example.damagotchi_26.ui.components.AuthBackground
@@ -17,12 +19,13 @@ import com.example.damagotchi_26.ui.components.AuthCard
 import com.example.damagotchi_26.ui.components.PrimaryAuthButton
 import com.example.damagotchi_26.ui.components.textStyle
 import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
-
+import com.example.damagotchi_26.viewmodel.TransicionViewModel
+import com.example.damagotchi_26.viewmodel.TransicionViewModelFactory
 
 
 @Composable
 fun Login(
-    onLogin: (user: String, pass: String) -> Unit,
+    onLogin: (user: String, pass: String, remember: Boolean) -> Unit,
     onGoRegister: () -> Unit,
     onForgotPassword: () -> Unit
 ) {
@@ -33,6 +36,14 @@ fun Login(
     var pass by remember { mutableStateOf("") }
 
     var rememberMe by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    // Creamos la instancia de PetPrefs usando el context
+    val petPrefs = remember { com.example.damagotchi_26.data.PetPrefs(context) }
+    // Se la pasamos a la Factory (que ahora espera PetPrefs por la Opción B)
+    val transicionViewModel: TransicionViewModel = viewModel(
+        factory = TransicionViewModelFactory(petPrefs)
+    )
 
     // Fondo general de la pantalla (rosa)
     AuthBackground {
@@ -46,7 +57,6 @@ fun Login(
 
             // Tarjeta que agrupa los campos de texto
             AuthCard {
-
                 // CAMPO USUARIO
                 OutlinedTextField(
                     value = user,
@@ -140,7 +150,7 @@ fun Login(
 
             PrimaryAuthButton(
                 text = "Iniciar Sesión",
-                onClick = { onLogin(user, pass) }, // Llama al login con los datos
+                onClick = { onLogin(user, pass, rememberMe) }, // Llama al login con los datos
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 100.dp)
@@ -172,7 +182,7 @@ fun LoginPreview() {
     MaterialTheme {
         Surface {
             Login(
-                onLogin = { _, _ -> },
+                onLogin = { _, _, _ -> },
                 onGoRegister = { },
                 onForgotPassword = { }
             )
