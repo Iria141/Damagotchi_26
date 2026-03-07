@@ -12,13 +12,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.damagotchi_26.data.PetPrefs
 import com.example.damagotchi_26.navigation.AppNav
 import com.example.damagotchi_26.viewmodel.PetViewModel
-import com.example.damagotchi_26.navigation.RoomsPagerScreen
 import com.example.damagotchi_26.viewmodel.PetViewModelFactory
 import com.example.damagotchi_26.viewmodel.TransicionViewModelFactory
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
 import com.example.damagotchi_26.data.UserPreferences
 
 class MainActivity : ComponentActivity() {

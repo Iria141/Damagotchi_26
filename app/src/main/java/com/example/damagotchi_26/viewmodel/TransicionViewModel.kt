@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.stateIn
 
 import kotlinx.coroutines.launch
 
-class TransicionViewModel (  private val petPrefs: PetPrefs) : ViewModel() {
+class TransicionViewModel (
+    private val petPrefs: PetPrefs?= null
+) : ViewModel() {
 
     //Esclarifica si es dia o noche
     var _momentoDia = MutableStateFlow(MomentoDia.DIA)
@@ -41,6 +43,10 @@ class TransicionViewModel (  private val petPrefs: PetPrefs) : ViewModel() {
 
     private var trabajoLuz: Job? = null
     private var ultimaSemanaAvisada: Int? = null
+
+    init {
+        iniciarCicloLuz()
+    }
 
 
     fun iniciarCicloLuz() {
@@ -77,6 +83,7 @@ class TransicionViewModel (  private val petPrefs: PetPrefs) : ViewModel() {
     }
 
     fun comprobarAvisoTrimestre(semana: Int) {
+        val prefs = petPrefs ?: return
         viewModelScope.launch {
             val (trimestre, umbral) = when (semana) {
                 14 -> com.example.damagotchi_26.domain.Trimestre.SEGUNDO to 14
@@ -86,13 +93,13 @@ class TransicionViewModel (  private val petPrefs: PetPrefs) : ViewModel() {
             }
 
             // ✅ si ya se mostró antes (aunque cierres la app), no se repite
-            if (petPrefs.yaMostradoAviso(umbral)) return@launch
+            if (prefs.yaMostradoAviso(umbral)) return@launch
 
             val texto = com.example.damagotchi_26.ui.theme.mensajesDeInicio(trimestre)
                 .firstOrNull() ?: return@launch
 
             _avisos.emit(texto)
-            petPrefs.marcarAvisoMostrado(umbral)
+            prefs.marcarAvisoMostrado(umbral)
         }
     }
 }

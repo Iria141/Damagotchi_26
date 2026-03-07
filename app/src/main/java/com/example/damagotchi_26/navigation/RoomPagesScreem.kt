@@ -21,14 +21,29 @@ import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoomsPagerScreen(transicionViewModel: TransicionViewModel, petViewModel: PetViewModel, momentoDia: StateFlow<MomentoDia>) {
-    val petEstado by petViewModel.pet.collectAsState()
+fun RoomsPagerScreen(
+    transicionViewModel: TransicionViewModel,
+    petViewModel: PetViewModel,
+    momentoDia: StateFlow<MomentoDia>
+) {
+    val petEstado by petViewModel.pet.collectAsState(initial = null)
+
+    if (petEstado == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator() // Muestra un cargando mientras el DataStore despierta
+        }
+        return // Detiene la ejecución aquí hasta que petEstado tenga datos
+    }
+
+    // 3. Ahora que sabemos que petEstado NO es null, extraemos el valor seguro
+    val pet = petEstado!!
+
 
     val rooms = listOf("Salón", "Cocina", "Dormitorio", "Baño", "Parque", "Consulta Médica")
     val pagerState = rememberPagerState(pageCount = { rooms.size })
 
-    LaunchedEffect(petEstado.semanaEmbarazo) {
-        transicionViewModel.comprobarAvisoTrimestre(petEstado.semanaEmbarazo)
+    LaunchedEffect(pet.semanaEmbarazo) {
+        transicionViewModel.comprobarAvisoTrimestre(pet.semanaEmbarazo)
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -90,37 +105,37 @@ fun RoomsPagerScreen(transicionViewModel: TransicionViewModel, petViewModel: Pet
             ) { page ->
                 when (page) {
                     0 -> LivingRoom(
-                        pet = petEstado,
+                        pet = pet,
                         beber = { petViewModel.hidratar() },
                         verTV = { petViewModel.verTV() },
                         leer = { petViewModel.leer() }
                     )
 
                     1 -> Kitchen(
-                        pet = petEstado,
+                        pet = pet,
                         comer = { petViewModel.alimentar() },
                         beber = { petViewModel.hidratar() }
                     )
 
 
                     2 -> BedRoom(
-                        pet = petEstado,
+                        pet = pet,
                         dormir = { petViewModel.dormir() }
                     )
 
                     3 -> BathRoom (
-                        pet = petEstado,
+                        pet = pet,
                         limpieza = { petViewModel.higiene()}
                     )
 
                     4 -> Park(
-                        pet = petEstado,
+                        pet = pet,
                         caminar = {petViewModel.caminar()},
                         yoga = {petViewModel.yoga()}
                     )
 
                     5 -> Clinic(
-                        pet = petEstado
+                        pet = pet
                     )
 
                 }

@@ -11,11 +11,16 @@ import com.example.damagotchi_26.viewmodel.PetViewModel
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.example.damagotchi_26.ui.login.NewUser
+import com.example.damagotchi_26.ui.login.login
+import com.example.damagotchi_26.ui.login.register
+import com.example.damagotchi_26.ui.login.AccountCreated
+import com.example.damagotchi_26.ui.login.ResetPassword
 
 
 sealed class Route(val path: String) {
     data object Login : Route("login")
-    data object Register : Route("register")
+    data object Register : Route("newUser")
     data object AccountCreated : Route("account_created")
     data object ResetPassword : Route("reset_password")
     data object PasswordResetDone : Route("password_reset_done")
@@ -24,7 +29,7 @@ sealed class Route(val path: String) {
 
 @Composable
 fun AppNav(
-    startDestination:String,
+    startDestination: String,
     transicionViewModel: TransicionViewModel,
     petViewModel: PetViewModel,
     momentoDia: StateFlow<MomentoDia>,
@@ -37,21 +42,28 @@ fun AppNav(
 
     NavHost(
         navController = navController,
-        startDestination = Route.Login.path
+        startDestination = startDestination
     ) {
         composable(Route.Login.path) {
             Login(
+                transicionViewModel = transicionViewModel,
                 onLogin = { user, pass, remember ->
-                    scope.launch {
-                        scope.launch { onRememberMeChanged(remember) }
-                    }
-                    navController.navigate(Route.Rooms.path) {
-                        popUpTo(Route.Login.path) { inclusive = true }
+                    login(user, pass) { ok, error ->
+                        if (ok) {
+                            scope.launch { onRememberMeChanged(remember) }
+
+                            navController.navigate(Route.Rooms.path) {
+                                popUpTo(Route.Login.path) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        } else {
+                            println("Login error: ${error ?: "desconocido"}")
+                            // Si quieres, aquí luego metemos Snackbar/AlertDialog
+                        }
                     }
                 },
                 onGoRegister = { navController.navigate(Route.Register.path) },
                 onForgotPassword = { navController.navigate(Route.ResetPassword.path) }
-
             )
         }
 
@@ -63,9 +75,44 @@ fun AppNav(
             )
         }
 
-        composable(Route.Register.path) { /* ... */ }
-        composable(Route.AccountCreated.path) { /* ... */ }
-        composable(Route.ResetPassword.path) { /* ... */ }
-        composable(Route.PasswordResetDone.path) { /* ... */ }
+        composable(Route.Register.path) {
+
+            NewUser(
+                onCreate = { email, pass ->
+                    register(email, pass) { ok, error ->
+                        if (ok) {
+                            println("REGISTRO OK")
+                            navController.navigate(Route.AccountCreated.path) {
+                                popUpTo(Route.Register.path) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        } else {
+                            println("REGISTRO ERROR: ${error ?: "desconocido"}")
+                        }
+                    }
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Route.AccountCreated.path) {
+            AccountCreated(
+                onGoLogin = {
+                    navController.navigate(Route.Login.path) {
+                        popUpTo(Route.Login.path) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+        composable(Route.ResetPassword.path) {
+            ResetPassword(
+                onBack = { navController.popBackStack() }
+            )        }
+        composable(Route.PasswordResetDone.path) {
+            androidx.compose.material3.Text("Se ha enviado un email para restablecer tu contraseña")
+        }
     }
 }
