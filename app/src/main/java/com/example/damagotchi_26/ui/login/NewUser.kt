@@ -67,7 +67,13 @@ fun register(email: String, password: String, onResult: (Boolean, String?) -> Un
 
 @Composable
 fun NewUser(
-    onCreate: (email: String, pass: String) -> Unit,
+onCreate: (
+    nombre: String,
+    fecha: String,
+    semana: String,
+    sexo: String,
+    email: String,
+    pass: String) -> Unit,
     onBack: () -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
@@ -308,7 +314,7 @@ fun NewUser(
                                 }
 
                                 else ->
-                                    onCreate(email, pass)
+                                    onCreate(nombre, fecha, semana, sexo, email, pass)
                             }
                         }
                     },
@@ -337,7 +343,7 @@ fun NewUserPreview() {
     MaterialTheme {
         Surface {
             NewUser(
-                onCreate = { _, _ -> },
+                onCreate = { _,_,_,_,_,_ -> },
                 onBack = { }
 
             )

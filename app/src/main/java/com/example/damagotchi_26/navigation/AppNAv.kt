@@ -16,6 +16,9 @@ import com.example.damagotchi_26.ui.login.login
 import com.example.damagotchi_26.ui.login.register
 import com.example.damagotchi_26.ui.login.AccountCreated
 import com.example.damagotchi_26.ui.login.ResetPassword
+import com.example.damagotchi_26.data.UserProfile
+import com.example.damagotchi_26.data.saveUserProfile
+import com.google.firebase.auth.FirebaseAuth
 
 
 sealed class Route(val path: String) {
@@ -78,16 +81,35 @@ fun AppNav(
         composable(Route.Register.path) {
 
             NewUser(
-                onCreate = { email, pass ->
+                onCreate = { nombre, fecha, semana, sexo, email, pass ->
                     register(email, pass) { ok, error ->
                         if (ok) {
-                            println("REGISTRO OK")
-                            navController.navigate(Route.AccountCreated.path) {
-                                popUpTo(Route.Register.path) { inclusive = true }
-                                launchSingleTop = true
+                            val uid = FirebaseAuth.getInstance().currentUser?.uid
+
+                            if (uid != null) {
+                                val profile = UserProfile(
+                                    nombre = nombre,
+                                    fechaNacimiento = fecha,
+                                    semanaGestacion = semana,
+                                    sexoBebe = sexo,
+                                    email = email
+                                )
+                                saveUserProfile(uid, profile) { savedOk, saveError ->
+                                    if (savedOk) {
+                                        navController.navigate(Route.AccountCreated.path) {
+                                            popUpTo(Route.Register.path) { inclusive = true }
+                                            launchSingleTop = true
+                                        }
+                                    } else {
+                                        println("Error guardando perfil: ${saveError ?: "desconocido"}")
+                                    }
+                                }
+                            } else {
+                                println("No se pudo obtener el uid del usuario")
                             }
+
                         } else {
-                            println("REGISTRO ERROR: ${error ?: "desconocido"}")
+                            println("Register error: ${error ?: "desconocido"}")
                         }
                     }
                 },
