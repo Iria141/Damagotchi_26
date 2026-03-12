@@ -81,7 +81,7 @@ fun AppNav(
         composable(Route.Register.path) {
 
             NewUser(
-                onCreate = { nombre, fecha, semana, sexo, email, pass ->
+                onCreate = { nombre, fecha, rol, semana, sexo, email, pass ->
                     register(email, pass) { ok, error ->
                         if (ok) {
                             val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -90,6 +90,7 @@ fun AppNav(
                                 val profile = UserProfile(
                                     nombre = nombre,
                                     fechaNacimiento = fecha,
+                                    rol = rol,
                                     semanaGestacion = semana,
                                     sexoBebe = sexo,
                                     email = email

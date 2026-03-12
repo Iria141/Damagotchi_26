@@ -1,7 +1,6 @@
 package com.example.damagotchi_26.ui.login
 
 
-import android.R
 import android.util.Patterns
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,30 +28,20 @@ import androidx.compose.material3.Surface
 import com.example.damagotchi_26.ui.components.AuthTextField
 import kotlinx.coroutines.launch
 import android.app.DatePickerDialog
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.platform.LocalContext
 import java.util.Calendar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
-import com.example.damagotchi_26.ui.Color.Color.BorderGray
-import com.example.damagotchi_26.ui.Color.Color.CardGray
 
 
 fun register(email: String, password: String, onResult: (Boolean, String?) -> Unit) {
@@ -67,17 +56,20 @@ fun register(email: String, password: String, onResult: (Boolean, String?) -> Un
 
 @Composable
 fun NewUser(
-onCreate: (
-    nombre: String,
-    fecha: String,
-    semana: String,
-    sexo: String,
-    email: String,
-    pass: String) -> Unit,
+    onCreate: (
+        nombre: String,
+        fecha: String,
+        rol: String,
+        semana: String,
+        sexo: String,
+        email: String,
+        pass: String
+    ) -> Unit,
     onBack: () -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
+    var rol by remember { mutableStateOf("") }
     var semana by remember { mutableStateOf("") }
     var sexo by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -85,6 +77,7 @@ onCreate: (
     var pass2 by remember { mutableStateOf("") }
     var nombreError by remember { mutableStateOf(false) }
     var fechaError by remember { mutableStateOf(false) }
+    var rolError by remember { mutableStateOf(false) }
     var semanaError by remember { mutableStateOf(false) }
     var sexoError by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
@@ -115,8 +108,10 @@ onCreate: (
         datePicker.maxDate = calendar.timeInMillis //limita las fecha hasta dia de hoy
     }
 
-    //desplegable sexo
-    var expanded by remember { mutableStateOf(false) }
+    //desplegable rol y sexo
+    var expandedrol by remember { mutableStateOf(false) }
+    var expandedsexo by remember { mutableStateOf(false) }
+
 
 
 
@@ -127,142 +122,188 @@ onCreate: (
         AuthBackground {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.Center
             ) {
-                AuthCard {
-                    AuthTextField(
-                        value = nombre,
-                        onValueChange = {
-                            nombre = it
-                            nombreError = false
-                        },
-                        label = "Nombre",
-                        isError = nombreError,
-                        errorMessage = "Introduce tu nombre"
+                AuthTextField(
+                    value = nombre,
+                    onValueChange = {
+                        nombre = it
+                        nombreError = false
+                    },
+                    label = "Nombre",
+                    isError = nombreError,
+                    errorMessage = "Introduce tu nombre"
+                )
+
+                AuthTextField(
+                    value = fecha,
+                    onValueChange = {},
+                    label = "Fecha de nacimiento",
+                    readOnly = true,
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.CalendarMonth,
+                            contentDescription = "Seleccionar fecha",
+                            tint = Color.DarkGray,
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    datePickerDialog.show()
+                                }
+                        )
+                    },
+                    isError = fechaError,
+                    errorMessage = "Introduce tu fecha de nacimiento",
+
                     )
 
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+
                     AuthTextField(
-                        value = fecha,
+                        value = rol,
                         onValueChange = {},
-                        label = "Fecha de nacimiento",
+                        label = "Rol",
                         readOnly = true,
+                        isError = rolError,
                         trailingIcon = {
                             Icon(
-                                imageVector = Icons.Filled.CalendarMonth,
-                                contentDescription = "Seleccionar fecha",
+                                imageVector = Icons.Filled.ArrowDropDown,
+                                contentDescription = "Desplegar",
                                 tint = Color.DarkGray,
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .clickable {
-                                        datePickerDialog.show()
-                                    }
+                                modifier = Modifier.clickable { expandedrol = !expandedrol }
                             )
                         },
-                        isError = fechaError,
-                        errorMessage = "Introduce tu fecha de nacimiento",
                         modifier = Modifier
-                            .fillMaxWidth()
-
+                            .clickable { expandedrol = true }
                     )
 
-                    AuthTextField(
-                        value = semana,
-                        onValueChange = {
-                            semana = it.filter { c -> c.isDigit() } //solo deja introducir números
-                            semanaError = false
-                        },
-                        label = "Semana de gestación",
-                        isError = semanaError,
-                        errorMessage = "Introduce la semana de gestación",
-                        keyboardType = KeyboardType.Number //teclado numerico
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
+                    DropdownMenu(
+                        expanded = expandedrol,
+                        onDismissRequest = { expandedrol = false }
                     ) {
-                        AuthTextField(
-                            value = sexo,
-                            onValueChange = {},
-                            label = "Sexo del bebé",
-                            readOnly = true,
-                            isError = sexoError,
-                            trailingIcon = {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowDropDown,
-                                    contentDescription = "Desplegar",
-                                    tint = Color.DarkGray,
-                                    modifier = Modifier.clickable { expanded = !expanded }
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { expanded = !expanded },
-                        )
-
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            listOf("Niño", "Niña", "Desconocido aún").forEach { opcion ->
-                                DropdownMenuItem(
-                                    text = { Text(opcion) },
-                                    onClick = {
-                                        sexo = opcion
-                                        sexoError = false
-                                        expanded = false
-                                    }
-                                )
-                            }
+                        listOf("Mamá", "Papá", "Otro").forEach { opcion ->
+                            DropdownMenuItem(
+                                text = { Text(opcion) },
+                                onClick = {
+                                    rol = opcion
+                                    rolError = false
+                                    expandedrol = false
+                                }
+                            )
                         }
                     }
+                }
 
-                    if (sexoError) {
-                        Text(
-                            text = "Selecciona una opción",
-                            color = Color.Red,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(start = 20.dp, top = 4.dp)
-                        )
-                    }
-
-                    AuthTextField(
-                        value = email,
-                        onValueChange = {
-                            email = it
-                            emailError = false
-                        },
-                        label = "Email",
-                        isError = emailError,
-                        errorMessage = "Email no válido"
-                    )
-
-                    AuthTextField(
-                        value = pass,
-                        onValueChange = {
-                            pass = it
-                            passError = false
-                        },
-                        label = "Contraseña",
-                        isPassword = true,
-                        isError = passError,
-                        errorMessage = "Mínimo 6 caracteres"
-                    )
-
-                    AuthTextField(
-                        value = pass2,
-                        onValueChange = {
-                            pass2 = it
-                            pass2Error = false
-                        },
-                        label = "Confirmar contraseña",
-                        isPassword = true,
-                        isError = pass2Error,
-                        errorMessage = "Las contraseñas no coinciden"
+                if (rolError) {
+                    Text(
+                        text = "Selecciona una opción",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 20.dp, top = 4.dp)
                     )
                 }
+
+
+                AuthTextField(
+                    value = semana,
+                    onValueChange = {
+                        semana = it.filter { c -> c.isDigit() } //solo deja introducir números
+                        semanaError = false
+                    },
+                    label = "Semana de gestación",
+                    isError = semanaError,
+                    errorMessage = "Introduce la semana de gestación",
+                    keyboardType = KeyboardType.Number //teclado numerico
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    AuthTextField(
+                        value = sexo,
+                        onValueChange = {},
+                        label = "Sexo del bebé",
+                        readOnly = true,
+                        isError = sexoError,
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowDropDown,
+                                contentDescription = "Desplegar",
+                                tint = Color.DarkGray,
+                                modifier = Modifier.clickable { expandedsexo = !expandedsexo }
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { expandedsexo = !expandedsexo },
+                    )
+
+                    DropdownMenu(
+                        expanded = expandedsexo,
+                        onDismissRequest = { expandedsexo = false }
+                    ) {
+                        listOf("Niño", "Niña", "Desconocido aún").forEach { opcion ->
+                            DropdownMenuItem(
+                                text = { Text(opcion) },
+                                onClick = {
+                                    sexo = opcion
+                                    sexoError = false
+                                    expandedsexo = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                if (sexoError) {
+                    Text(
+                        text = "Selecciona una opción",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 20.dp, top = 4.dp)
+                    )
+                }
+
+                AuthTextField(
+                    value = email,
+                    onValueChange = {
+                        email = it
+                        emailError = false
+                    },
+                    label = "Email",
+                    isError = emailError,
+                    errorMessage = "Email no válido"
+                )
+
+                AuthTextField(
+                    value = pass,
+                    onValueChange = {
+                        pass = it
+                        passError = false
+                    },
+                    label = "Contraseña",
+                    isPassword = true,
+                    isError = passError,
+                    errorMessage = "Mínimo 6 caracteres"
+                )
+
+                AuthTextField(
+                    value = pass2,
+                    onValueChange = {
+                        pass2 = it
+                        pass2Error = false
+                    },
+                    label = "Confirmar contraseña",
+                    isPassword = true,
+                    isError = pass2Error,
+                    errorMessage = "Las contraseñas no coinciden"
+                )
+
 
                 Spacer(Modifier.height(14.dp))
 
@@ -271,6 +312,7 @@ onCreate: (
                         scope.launch {
                             nombreError = false
                             fechaError = false
+                            rolError = false
                             semanaError = false
                             sexoError = false
                             emailError = false
@@ -283,6 +325,10 @@ onCreate: (
 
                                 fecha.isBlank() -> {
                                     fechaError = true
+                                }
+
+                                rol.isBlank() -> {
+                                    rolError = true
                                 }
 
                                 semana.isBlank() -> {
@@ -314,7 +360,7 @@ onCreate: (
                                 }
 
                                 else ->
-                                    onCreate(nombre, fecha, semana, sexo, email, pass)
+                                    onCreate(nombre, fecha, rol, semana, sexo, email, pass)
                             }
                         }
                     },
@@ -327,7 +373,8 @@ onCreate: (
 
                 TextButton(
                     onClick = onBack,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
                 ) {
                     Text("Volver")
                 }
@@ -343,7 +390,7 @@ fun NewUserPreview() {
     MaterialTheme {
         Surface {
             NewUser(
-                onCreate = { _,_,_,_,_,_ -> },
+                onCreate = { _, _, _, _, _, _, _ -> },
                 onBack = { }
 
             )

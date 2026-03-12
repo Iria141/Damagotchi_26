@@ -6,6 +6,7 @@ import com.google.firebase.firestore.firestore
 data class UserProfile(
     val nombre: String = "",
     val fechaNacimiento: String = "",
+    val rol: String = "",
     val semanaGestacion: String = "",
     val sexoBebe: String = "",
     val email: String = ""
