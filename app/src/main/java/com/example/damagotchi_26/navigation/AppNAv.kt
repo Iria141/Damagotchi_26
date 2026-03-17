@@ -18,17 +18,13 @@ import com.example.damagotchi_26.ui.login.AccountCreated
 import com.example.damagotchi_26.ui.login.ResetPassword
 import com.example.damagotchi_26.data.UserProfile
 import com.example.damagotchi_26.data.saveUserProfile
+import com.example.damagotchi_26.ui.theme.Welcome
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import com.example.damagotchi_26.data.UserPreferences
+import com.example.damagotchi_26.data.getUserProfile
 
-
-sealed class Route(val path: String) {
-    data object Login : Route("login")
-    data object Register : Route("newUser")
-    data object AccountCreated : Route("account_created")
-    data object ResetPassword : Route("reset_password")
-    data object PasswordResetDone : Route("password_reset_done")
-    data object Rooms : Route("rooms")
-}
 
 @Composable
 fun AppNav(
@@ -40,8 +36,10 @@ fun AppNav(
 ) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope ()
-
-
+    var userProfile by remember { mutableStateOf<com.example.damagotchi_26.data.UserProfile?>(null) }
+    val context = LocalContext.current
+    val userPreferences = remember { UserPreferences(context) }
+    val welcomeSeen by userPreferences.welcomeSeenFlow.collectAsState(initial = false)
 
     NavHost(
         navController = navController,
@@ -55,13 +53,33 @@ fun AppNav(
                         if (ok) {
                             scope.launch { onRememberMeChanged(remember) }
 
-                            navController.navigate(Route.Rooms.path) {
-                                popUpTo(Route.Login.path) { inclusive = true }
-                                launchSingleTop = true
+                            val uid = FirebaseAuth.getInstance().currentUser?.uid
+
+                            if (uid != null) {
+                                getUserProfile(uid) { profile, profileError ->
+                                    if (profile != null) {
+                                        userProfile = profile
+
+                                        val destino = if (!welcomeSeen) {
+                                            Route.Welcome.path
+                                        } else {
+                                            Route.Rooms.path
+                                        }
+
+                                        navController.navigate(destino) {
+                                            popUpTo(Route.Login.path) { inclusive = true }
+                                            launchSingleTop = true
+                                        }
+
+                                    } else {
+                                        println("Error cargando perfil: ${profileError ?: "desconocido"}")
+                                    }
+                                }
+                            } else {
+                                println("No se pudo obtener el uid del usuario")
                             }
                         } else {
                             println("Login error: ${error ?: "desconocido"}")
-                            // Si quieres, aquí luego metemos Snackbar/AlertDialog
                         }
                     }
                 },
@@ -74,7 +92,9 @@ fun AppNav(
             RoomsPagerScreen(
                 transicionViewModel = transicionViewModel,
                 petViewModel = petViewModel,
-                momentoDia = momentoDia
+                momentoDia = momentoDia,
+                nombre = userProfile?.nombre ?: "Usuario",
+                rol = userProfile?.rol ?: "Otro"
             )
         }
 
@@ -130,6 +150,22 @@ fun AppNav(
                 }
             )
         }
+
+        composable(Route.Welcome.path) {
+            Welcome(
+                nombre = userProfile?.nombre ?: "Usuario",
+                rol = userProfile?.rol ?: "Otro",
+                onStart = {
+                    scope.launch { userPreferences.setWelcomeSeen(true) }
+
+                    navController.navigate(Route.Rooms.path) {
+                        popUpTo(Route.Welcome.path) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
         composable(Route.ResetPassword.path) {
             ResetPassword(
                 onBack = { navController.popBackStack() }

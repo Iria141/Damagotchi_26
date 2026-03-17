@@ -29,3 +29,25 @@ fun saveUserProfile(
             onResult(false, e.message)
         }
 }
+
+fun getUserProfile(
+    uid: String,
+    onResult: (UserProfile?, String?) -> Unit
+) {
+    val db = Firebase.firestore
+
+    db.collection("users")
+        .document(uid)
+        .get()
+        .addOnSuccessListener { document ->
+            if (document.exists()) {
+                val profile = document.toObject(UserProfile::class.java)
+                onResult(profile, null)
+            } else {
+                onResult(null, "No existe el perfil del usuario")
+            }
+        }
+        .addOnFailureListener { e ->
+            onResult(null, e.message)
+        }
+}

@@ -24,7 +24,9 @@ import kotlinx.coroutines.flow.StateFlow
 fun RoomsPagerScreen(
     transicionViewModel: TransicionViewModel,
     petViewModel: PetViewModel,
-    momentoDia: StateFlow<MomentoDia>
+    momentoDia: StateFlow<MomentoDia>,
+    nombre: String,
+    rol: String
 ) {
     val petEstado by petViewModel.pet.collectAsState(initial = null)
 
@@ -35,15 +37,14 @@ fun RoomsPagerScreen(
         return // Detiene la ejecución aquí hasta que petEstado tenga datos
     }
 
-    // 3. Ahora que sabemos que petEstado NO es null, extraemos el valor seguro
     val pet = petEstado!!
-
-
     val rooms = listOf("Salón", "Cocina", "Dormitorio", "Baño", "Parque", "Consulta Médica")
     val pagerState = rememberPagerState(pageCount = { rooms.size })
 
     LaunchedEffect(pet.semanaEmbarazo) {
-        transicionViewModel.comprobarAvisoTrimestre(pet.semanaEmbarazo)
+        transicionViewModel.comprobarAvisoTrimestre(
+            pet.semanaEmbarazo,
+            rol = rol)
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -56,6 +57,7 @@ fun RoomsPagerScreen(
             )
         }
     }
+    
 
     Scaffold(
         snackbarHost = {
@@ -98,6 +100,8 @@ fun RoomsPagerScreen(
                     .fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(10.dp))
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
@@ -135,7 +139,9 @@ fun RoomsPagerScreen(
                     )
 
                     5 -> Clinic(
-                        pet = pet
+                        pet = pet,
+                        rol = rol,
+                        transicionViewModel = transicionViewModel
                     )
 
                 }
@@ -168,3 +174,4 @@ private fun RoomDots(total: Int, current: Int, modifier: Modifier = Modifier) {
         }
     }
 }
+

@@ -57,12 +57,12 @@ class TransicionViewModel (
                 delay(tiempoLuz()) // 1,24 horas
                 _momentoDia.value =
                     if (_momentoDia.value == MomentoDia.DIA) MomentoDia.NOCHE
-                else MomentoDia.DIA
+                    else MomentoDia.DIA
 
                 // cuando vuelve a DIA, pasa un día
                 if (_momentoDia.value == MomentoDia.DIA) {
                     avanzarDia()
-                    }
+                }
             }
         }
     }
@@ -82,32 +82,46 @@ class TransicionViewModel (
         super.onCleared()
     }
 
-    fun comprobarAvisoTrimestre(semana: Int) {
+    fun comprobarAvisoTrimestre(semana: Int, rol: String) {
         val prefs = petPrefs ?: return
         viewModelScope.launch {
             val (trimestre, umbral) = when (semana) {
                 14 -> com.example.damagotchi_26.domain.Trimestre.SEGUNDO to 14
                 28 -> com.example.damagotchi_26.domain.Trimestre.TERCERO to 28
-                1  -> com.example.damagotchi_26.domain.Trimestre.PRIMERO to 1  // opcional
+                1 -> com.example.damagotchi_26.domain.Trimestre.PRIMERO to 1  // opcional
                 else -> return@launch
             }
 
-            // ✅ si ya se mostró antes (aunque cierres la app), no se repite
+            // si ya se mostró antes (aunque cierres la app), no se repite
             if (prefs.yaMostradoAviso(umbral)) return@launch
 
-            val texto = com.example.damagotchi_26.ui.theme.mensajesDeInicio(trimestre)
+            val texto = com.example.damagotchi_26.ui.theme.mensajesDeInicio(trimestre, rol)
                 .firstOrNull() ?: return@launch
 
             _avisos.emit(texto)
             prefs.marcarAvisoMostrado(umbral)
         }
     }
+
+
+    fun comprobarEventoEspecial(semana: Int, rol: String) {
+        val prefs = petPrefs ?: return
+
+        viewModelScope.launch {
+            val texto = com.example.damagotchi_26.ui.theme
+                .mensajeEventoEspecial(semana, rol) ?: return@launch
+
+            if (prefs.yaMostradoEvento(semana)) return@launch
+
+            _avisos.emit(texto)
+            prefs.marcarEventoMostrado(semana)
+        }
+    }
 }
 
+
 object TimeConfig { //MODO PRESENTACION -- ACTIVAR DEBUG
-
     const val DEBUG = true // false en producción
-
     const val SEGUNDO = 1_000L
     const val MINUTO = 60 * SEGUNDO
     const val HORA = 60 * MINUTO
@@ -115,4 +129,6 @@ object TimeConfig { //MODO PRESENTACION -- ACTIVAR DEBUG
     const val CICLO_LUZ_DEBUG = 5 * SEGUNDO        // 5 segundos
     const val CICLO_LUZ_REAL = (1.24 * HORA).toLong()
 }
+
+
 

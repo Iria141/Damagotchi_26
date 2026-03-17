@@ -10,6 +10,7 @@ import com.example.damagotchi_26.domain.Pet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+
 private val Context.dataStore by preferencesDataStore(name = "pet_prefs")
 
 class PetPrefs(private val context: Context) {
@@ -23,6 +24,10 @@ class PetPrefs(private val context: Context) {
     private val AVISO_T1 = booleanPreferencesKey("aviso_trimestre_1")
     private val AVISO_T2 = booleanPreferencesKey("aviso_trimestre_14")
     private val AVISO_T3 = booleanPreferencesKey("aviso_trimestre_28")
+    private val EVENTO_12 = booleanPreferencesKey("evento_semana_12")
+    private val EVENTO_20 = booleanPreferencesKey("evento_semana_20")
+    private val EVENTO_36 = booleanPreferencesKey("evento_semana_36")
+
 
 
     val petFlow: Flow<Pet> = context.dataStore.data.map { prefs ->
@@ -69,5 +74,29 @@ class PetPrefs(private val context: Context) {
         }
     }
 
+    //comprueba si el evento ha sido visto
+    suspend fun yaMostradoEvento(semana: Int): Boolean {
+        val key = when (semana) {
+            12 -> EVENTO_12
+            20 -> EVENTO_20
+            36 -> EVENTO_36
+            else -> return true
+        }
+        return context.dataStore.data.first()[key] ?: false
+    }
+
+
+    //marcar el evento como visto
+    suspend fun marcarEventoMostrado(semana: Int) {
+        val key = when (semana) {
+            12 -> EVENTO_12
+            20 -> EVENTO_20
+            36 -> EVENTO_36
+            else -> return
+        }
+        context.dataStore.edit { prefs ->
+            prefs[key] = true
+        }
+    }
 
 }

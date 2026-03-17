@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.damagotchi_26.ui.Color.Color.BorderGray
 import com.example.damagotchi_26.ui.Color.Color.CardGray
+import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
 
 
 @Composable
@@ -35,6 +37,12 @@ fun AuthBackground(
         content = content
     )
 }
+
+val textStyle = androidx.compose.ui.text.TextStyle(
+    fontSize = 14.sp,
+    color = PurpleBlueText,
+    fontWeight = FontWeight.Normal
+)
 
 @Composable
 fun AuthCard(
@@ -82,7 +90,6 @@ fun AuthTextField(
     modifier: Modifier = Modifier
 ) {
     Column {
-
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
@@ -157,3 +164,5 @@ fun AuthInfoBox(
         )
     }
 }
+
+
