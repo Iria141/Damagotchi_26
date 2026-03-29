@@ -54,7 +54,25 @@ fun Clinic(
         }
     }
     val recordatorio = listaRecordatorios.getOrNull(idx) //Recordatorio equivalente al indice actual
+    val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(Unit) {
+        transicionViewModel.avisos.collect { msg ->
+            val result = snackbarHostState.showSnackbar(
+                message = msg,
+                duration = SnackbarDuration.Long
+            )
+        }
+    }
+
+    val diaActual by transicionViewModel.diaActual.collectAsState()
+    LaunchedEffect(diaActual, pet.semanaEmbarazo, rol) {
+        transicionViewModel.comprobarConsejoDelDia(
+            semana = pet.semanaEmbarazo,
+            dia = diaActual,
+            rol = rol
+        )
+    }
 
     Scaffold(
         topBar = {

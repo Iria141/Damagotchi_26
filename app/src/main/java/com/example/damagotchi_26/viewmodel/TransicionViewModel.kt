@@ -117,6 +117,24 @@ class TransicionViewModel (
             prefs.marcarEventoMostrado(semana)
         }
     }
+
+    fun comprobarConsejoDelDia(semana: Int, dia: Int, rol: String) {
+        val prefs = petPrefs ?: return
+
+        viewModelScope.launch {
+            val ultimoDiaMostrado = prefs.ultimoDiaConsejoMostrado()
+            if (ultimoDiaMostrado == dia) return@launch
+
+            val trimestre = com.example.damagotchi_26.ui.theme.trimestreDeSemana(semana)
+
+            val texto = com.example.damagotchi_26.ui.theme
+                .consejoDelDia(trimestre, rol, dia) ?: return@launch
+
+            _avisos.emit("💡 Consejo del día: $texto")
+            prefs.marcarConsejoDia(dia)
+        }
+    }
+
 }
 
 

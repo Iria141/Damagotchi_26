@@ -229,3 +229,11 @@ fun mensajeEventoEspecial(semana: Int, rol: String): String? {
         else -> evento.textoOtro
     }
 }
+
+fun consejoDelDia(trimestre: Trimestre, rol: String, dia: Int): String? {
+    val lista = recordatoriosPorTrimestre(trimestre, rol)
+    if (lista.isEmpty()) return null
+
+    val indice = dia % lista.size
+    return lista[indice].texto
+}

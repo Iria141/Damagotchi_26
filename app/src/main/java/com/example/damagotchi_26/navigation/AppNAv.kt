@@ -1,5 +1,6 @@
 package com.example.damagotchi_26.navigation
 
+import CommunityScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
@@ -24,6 +25,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.damagotchi_26.data.UserPreferences
 import com.example.damagotchi_26.data.getUserProfile
+import com.example.damagotchi_26.ui.Community.CreatePostScreen
+import com.example.damagotchi_26.ui.Community.PostDetailScreen
+import com.example.damagotchi_26.ui.Menu.Menu
+import com.example.damagotchi_26.ui.MiEmbarazo.SeguimientoScreem
 
 
 @Composable
@@ -35,7 +40,7 @@ fun AppNav(
     onRememberMeChanged: suspend (Boolean) -> Unit
 ) {
     val navController = rememberNavController()
-    val scope = rememberCoroutineScope ()
+    val scope = rememberCoroutineScope()
     var userProfile by remember { mutableStateOf<com.example.damagotchi_26.data.UserProfile?>(null) }
     val context = LocalContext.current
     val userPreferences = remember { UserPreferences(context) }
@@ -63,12 +68,13 @@ fun AppNav(
                                         val destino = if (!welcomeSeen) {
                                             Route.Welcome.path
                                         } else {
-                                            Route.Rooms.path
+                                            Route.Menu.path
                                         }
 
                                         navController.navigate(destino) {
                                             popUpTo(Route.Login.path) { inclusive = true }
-                                            launchSingleTop = true
+                                            launchSingleTop = true //Evita abrir pantallas duplicadas
+
                                         }
 
                                     } else {
@@ -83,8 +89,12 @@ fun AppNav(
                         }
                     }
                 },
-                onGoRegister = { navController.navigate(Route.Register.path) },
-                onForgotPassword = { navController.navigate(Route.ResetPassword.path) }
+                onGoRegister = { navController.navigate(Route.Register.path)
+                { launchSingleTop = true }
+                },
+                onForgotPassword = { navController.navigate(Route.ResetPassword.path)
+                { launchSingleTop = true }
+                }
             )
         }
 
@@ -158,7 +168,7 @@ fun AppNav(
                 onStart = {
                     scope.launch { userPreferences.setWelcomeSeen(true) }
 
-                    navController.navigate(Route.Rooms.path) {
+                    navController.navigate(Route.Menu.path) {
                         popUpTo(Route.Welcome.path) { inclusive = true }
                         launchSingleTop = true
                     }
@@ -169,9 +179,68 @@ fun AppNav(
         composable(Route.ResetPassword.path) {
             ResetPassword(
                 onBack = { navController.popBackStack() }
-            )        }
+            )
+        }
         composable(Route.PasswordResetDone.path) {
             androidx.compose.material3.Text("Se ha enviado un email para restablecer tu contraseña")
+        }
+
+
+        composable(Route.Menu.path) {
+            Menu(
+                rol = userProfile?.rol ?: "Otro",
+                nombre = userProfile?.nombre ?: "Usuario",
+                onPlayClick = { navController.navigate(Route.Rooms.path)
+                { launchSingleTop = true } //Evita abrir pantallas duplicadas
+                  },
+                onCommunityClick = { navController.navigate(Route.Community.path)
+                { launchSingleTop = true }
+                },
+                onSeguimientoClick = { navController.navigate(Route.SeguimientoScreem.path)
+                { launchSingleTop = true }
+
+                }
+            )
+        }
+
+        composable(Route.Community.path) {
+            CommunityScreen(
+                onCreatePostClick = { navController.navigate(Route.CreatePost.path) },
+                onPostClick = { postId -> navController.navigate("detalle_post/$postId")
+                },
+                onBack = { navController.popBackStack() }
+
+            )
+        }
+
+        composable(Route.CreatePost.path) {
+            CreatePostScreen(
+                isAdmin = (userProfile?.rol ?: "").lowercase() == "admin",
+                onPublishClick = { titulo, contenido, tipo ->
+                    navController.popBackStack()
+                },
+                onBack = { navController.popBackStack() }
+
+            )
+        }
+
+        composable(Route.PostDetail.path) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId") ?: ""
+
+            PostDetailScreen(
+                postId = postId,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Route.SeguimientoScreem.path) {
+            SeguimientoScreem(
+                rol = userProfile?.rol ?: "Otro",
+                semanaReal = userProfile?.semanaGestacion?.toIntOrNull() ?: 1,
+                nombre = userProfile?.nombre ?: "Usuario",
+                onBack = { navController.popBackStack() }
+
+            )
         }
     }
 }

@@ -41,6 +41,7 @@ fun RoomsPagerScreen(
     val rooms = listOf("Salón", "Cocina", "Dormitorio", "Baño", "Parque", "Consulta Médica")
     val pagerState = rememberPagerState(pageCount = { rooms.size })
 
+
     LaunchedEffect(pet.semanaEmbarazo) {
         transicionViewModel.comprobarAvisoTrimestre(
             pet.semanaEmbarazo,
@@ -49,14 +50,7 @@ fun RoomsPagerScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        transicionViewModel.avisos.collect { msg ->
-            val result = snackbarHostState.showSnackbar(
-                message = msg,
-                duration = SnackbarDuration.Long
-            )
-        }
-    }
+
     
 
     Scaffold(

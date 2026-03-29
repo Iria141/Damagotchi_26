@@ -71,6 +71,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.7.0")
     implementation ("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.foundation.layout)
+    implementation(libs.androidx.material3)
 
     // --- TESTING ---
     testImplementation(libs.junit)

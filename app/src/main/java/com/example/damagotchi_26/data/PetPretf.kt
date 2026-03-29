@@ -21,12 +21,17 @@ class PetPrefs(private val context: Context) {
     private val KEY_SED = intPreferencesKey("sed")
     private val KEY_DESCANSO = intPreferencesKey("dormir")
     private val KEY_HIGIENE = intPreferencesKey("limpieza")
+    private val KEY_SEMANA = intPreferencesKey("semana_embarazo")
+    private val KEY_DIA = intPreferencesKey("dia_embarazo")
+
     private val AVISO_T1 = booleanPreferencesKey("aviso_trimestre_1")
     private val AVISO_T2 = booleanPreferencesKey("aviso_trimestre_14")
     private val AVISO_T3 = booleanPreferencesKey("aviso_trimestre_28")
     private val EVENTO_12 = booleanPreferencesKey("evento_semana_12")
     private val EVENTO_20 = booleanPreferencesKey("evento_semana_20")
     private val EVENTO_36 = booleanPreferencesKey("evento_semana_36")
+    private val KEY_DIA_CONSEJO = intPreferencesKey("dia_consejo_mostrado")
+
 
 
 
@@ -37,7 +42,9 @@ class PetPrefs(private val context: Context) {
             actividad = prefs[KEY_DIVERSION] ?: 100,
             sed = prefs[KEY_SED] ?: 100,
             descanso = prefs[KEY_DESCANSO] ?: 100,
-            limpieza = prefs[KEY_HIGIENE] ?: 100
+            limpieza = prefs[KEY_HIGIENE] ?: 100,
+            semanaEmbarazo = prefs[KEY_SEMANA] ?: 1,
+            diaEmbarazo = prefs[KEY_DIA] ?:1
         )
     }
 
@@ -49,6 +56,9 @@ class PetPrefs(private val context: Context) {
             prefs[KEY_SED] = pet.sed
             prefs[KEY_DESCANSO] = pet.descanso
             prefs[KEY_HIGIENE] = pet.limpieza
+            prefs[KEY_SEMANA] = pet.semanaEmbarazo
+            prefs[KEY_DIA] = pet.diaEmbarazo
+
         }
     }
 
@@ -98,5 +108,16 @@ class PetPrefs(private val context: Context) {
             prefs[key] = true
         }
     }
+
+    suspend fun ultimoDiaConsejoMostrado(): Int {
+        return context.dataStore.data.first()[KEY_DIA_CONSEJO] ?: 0
+    }
+
+    suspend fun marcarConsejoDia(dia: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_DIA_CONSEJO] = dia
+        }
+    }
+
 
 }

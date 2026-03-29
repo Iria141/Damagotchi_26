@@ -12,15 +12,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-
 /*
-* Hace que los medidores suban o bajen su porcentaje
-* Implementacion de la temporalizacion del embarazo.
-
-*/
-
-
-class PetViewModel( private val prefs: PetPrefs
+ * Hace que los medidores suban o bajen su porcentaje
+ * Implementacion de la temporalizacion del embarazo.
+ */
+class PetViewModel(
+    private val prefs: PetPrefs
 ) : ViewModel() {
 
     val pet: StateFlow<Pet> = prefs.petFlow.stateIn(
@@ -32,10 +29,8 @@ class PetViewModel( private val prefs: PetPrefs
     private var trabajoTick: Job? = null
     private var trabajoTiempo: Job? = null
 
-    private val minutosRealesPorDiaFicticio = 155L   // modo REAL
- // private val minutosRealesPorDiaFicticio = 1L  // modo DEMO (prueba rápida)
-
-
+    private val minutosRealesPorDiaFicticio = 155L
+    // private val minutosRealesPorDiaFicticio = 1L // modo DEMO
 
     fun iniciarTick() {
         if (trabajoTick != null) return
@@ -43,6 +38,7 @@ class PetViewModel( private val prefs: PetPrefs
         trabajoTick = viewModelScope.launch {
             while (true) {
                 delay(30_000)
+
                 val actual = pet.value
                 val actualizado = actual.copy(
                     hambre = limitar(actual.hambre - 2),
@@ -52,6 +48,7 @@ class PetViewModel( private val prefs: PetPrefs
                     limpieza = limitar(actual.limpieza - 1),
                     descanso = limitar(actual.descanso - 2)
                 )
+
                 prefs.guardar(actualizado)
             }
         }
@@ -95,7 +92,6 @@ class PetViewModel( private val prefs: PetPrefs
         )
     }
 
-
     fun dormir() = actualizar { actual ->
         actual.copy(
             descanso = limitar(actual.descanso + 20),
@@ -131,13 +127,33 @@ class PetViewModel( private val prefs: PetPrefs
             limpieza = limitar(actual.limpieza + 8),
             sed = limitar(actual.sed - 2),
             actividad = limitar(actual.actividad + 15)
-
         )
     }
 
     fun avanzarSemana() = actualizar { actual ->
         actual.copy(
-            semanaEmbarazo = (actual.semanaEmbarazo + 1).coerceAtMost(40) //avanza una semana hasta llegar a 40
+            semanaEmbarazo = (actual.semanaEmbarazo + 1).coerceAtMost(40)
+        )
+    }
+
+    fun iniciarTiempo() {
+        if (trabajoTiempo != null) return
+
+        trabajoTiempo = viewModelScope.launch {
+            while (true) {
+                delay(minutosRealesPorDiaFicticio * 60 * 1000L)
+                avanzarDia()
+            }
+        }
+    }
+
+    private fun avanzarDia() = actualizar { actual ->
+        val nuevoDia = (actual.diaEmbarazo + 1).coerceAtMost(280)
+        val nuevaSemana = ((nuevoDia - 1) / 7) + 1
+
+        actual.copy(
+            diaEmbarazo = nuevoDia,
+            semanaEmbarazo = nuevaSemana.coerceAtMost(40)
         )
     }
 
@@ -149,38 +165,7 @@ class PetViewModel( private val prefs: PetPrefs
 
     override fun onCleared() {
         trabajoTick?.cancel()
+        trabajoTiempo?.cancel()
         super.onCleared()
     }
-
-
-    fun iniciarTiempo() {
-        if (trabajoTiempo != null) return
-
-        trabajoTiempo = viewModelScope.launch {
-            while (true) {
-                delay(155 * 60 * 1000L) // 155 min reales → 1 día ficticio ()
-                avanzarDia()
-            }
-        }
-    }
-
-    private fun avanzarDia() {
-        val actual = pet.value
-        val nuevoDia = (actual.diaEmbarazo + 1).coerceAtMost(280)
-        val nuevaSemana = ((nuevoDia - 1) / 7) + 1
-
-        val actualizado = actual.copy(
-            diaEmbarazo = nuevoDia,
-            semanaEmbarazo = nuevaSemana.coerceAtMost(40)
-        )
-
-        //Coroutine (es como "tranquilo realiza esto sin prisas en suguendo plano.., Sin prisa pero sin pausa"(hilos))
-        viewModelScope.launch {
-            prefs.guardar(pet = actualizado)
-        }
-    }
-
-
-
 }
-
