@@ -28,6 +28,7 @@ import com.example.damagotchi_26.data.getUserProfile
 import com.example.damagotchi_26.ui.Community.CreatePostScreen
 import com.example.damagotchi_26.ui.Community.PostDetailScreen
 import com.example.damagotchi_26.ui.Menu.Menu
+import com.example.damagotchi_26.ui.MiEmbarazo.CrearAnuncioAdmin
 import com.example.damagotchi_26.ui.MiEmbarazo.SeguimientoScreem
 
 
@@ -238,9 +239,22 @@ fun AppNav(
                 rol = userProfile?.rol ?: "Otro",
                 semanaReal = userProfile?.semanaGestacion?.toIntOrNull() ?: 1,
                 nombre = userProfile?.nombre ?: "Usuario",
-                onBack = { navController.popBackStack() }
-
+                onBack = { navController.popBackStack() },
+                onAddAnuncioClick = {
+                    navController.navigate(Route.CrearAnuncioAdmin.path)
+                }
             )
         }
+
+        composable(Route.CrearAnuncioAdmin.path) {
+            CrearAnuncioAdmin(
+                onBack = { navController.popBackStack() },
+                onPublishClick = { titulo, semana, categoria, contenido, fuente, url ->
+                    // guardar en Firebase
+                    navController.popBackStack()
+                }
+            )
+        }
+
     }
 }

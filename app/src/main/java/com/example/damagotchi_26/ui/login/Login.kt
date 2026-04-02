@@ -8,14 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.damagotchi_26.ui.Color.Color.BorderGray
-import com.example.damagotchi_26.ui.Color.Color.CardGray
 import com.example.damagotchi_26.ui.components.AuthBackground
 import com.example.damagotchi_26.ui.components.AuthCard
 import com.example.damagotchi_26.ui.components.textStyle
@@ -23,8 +17,7 @@ import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
 import com.example.damagotchi_26.ui.components.AuthTextField
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+
 
 
 // FUNCIÓN QUE REALIZA EL LOGIN EN FIREBASE

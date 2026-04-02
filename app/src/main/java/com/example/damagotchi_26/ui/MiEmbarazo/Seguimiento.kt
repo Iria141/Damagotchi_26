@@ -28,17 +28,21 @@ import com.example.damagotchi_26.ui.components.SoftDisclaimer
 import com.example.damagotchi_26.ui.components.SweetSectionCard
 import com.example.damagotchi_26.ui.components.WeekHighlightCard
 import androidx.compose.runtime.*
+import androidx.navigation.NavController
 import com.example.damagotchi_26.data.PublicacionInformativa
+import com.example.damagotchi_26.navigation.Route
 import com.example.damagotchi_26.repository.PublicacionesInformativasRepository
 import com.example.damagotchi_26.ui.components.BackTextButton
+import com.example.damagotchi_26.ui.components.PrimaryAuthButton
 
 @Composable
 fun SeguimientoScreem(
     rol: String,
     semanaReal: Int,
     nombre: String = "",
-    onBack: () -> Unit = {}
-) {
+    onBack: () -> Unit = {},
+    onAddAnuncioClick: () -> Unit = {},
+    ) {
     val esMama = rol.lowercase() == "mamá" || rol.lowercase() == "mama"
     val titulo = if (esMama) "Mi embarazo" else "Seguimiento"
 
@@ -94,6 +98,15 @@ fun SeguimientoScreem(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
+
+                if (rol.lowercase() == "admin") {
+                    PrimaryAuthButton(
+                        text = "Añadir anuncio",
+                        onClick = onAddAnuncioClick,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
@@ -152,45 +165,46 @@ fun SeguimientoScreem(
                 }
 
                 SoftDisclaimer(
+                    modifier = Modifier
+                        .padding(bottom = 80.dp),
                     text = "La información mostrada es orientativa y no sustituye la valoración de profesionales de la salud."
+
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                BackTextButton(onClick = onBack)
             }
         }
     }
 }
 
-fun obtenerTrimestre(semana: Int): String {
-    return when (semana) {
-        in 1..13 -> "Primer trimestre"
-        in 14..27 -> "Segundo trimestre"
-        in 28..40 -> "Tercer trimestre"
-        else -> "Semana fuera de rango"
+    fun obtenerTrimestre(semana: Int): String {
+        return when (semana) {
+            in 1..13 -> "Primer trimestre"
+            in 14..27 -> "Segundo trimestre"
+            in 28..40 -> "Tercer trimestre"
+            else -> "Semana fuera de rango"
+        }
     }
-}
 
-fun obtenerMensajeSemana(semana: Int): String {
-    return when (semana) {
-        in 1..13 -> "Es una etapa de muchos cambios iniciales. Puede ser útil priorizar el descanso, resolver dudas frecuentes y mantener un seguimiento cercano."
-        in 14..27 -> "Suele ser una fase algo más estable. Es un buen momento para reforzar hábitos saludables y seguir aprendiendo sobre esta etapa."
-        in 28..40 -> "En esta etapa final puede apetecer más calma, preparación y acompañamiento. También puede ser útil revisar información práctica y señales a tener en cuenta."
-        else -> "No hay información disponible para esta semana."
+    fun obtenerMensajeSemana(semana: Int): String {
+        return when (semana) {
+            in 1..13 -> "Es una etapa de muchos cambios iniciales. Puede ser útil priorizar el descanso, resolver dudas frecuentes y mantener un seguimiento cercano."
+            in 14..27 -> "Suele ser una fase algo más estable. Es un buen momento para reforzar hábitos saludables y seguir aprendiendo sobre esta etapa."
+            in 28..40 -> "En esta etapa final puede apetecer más calma, preparación y acompañamiento. También puede ser útil revisar información práctica y señales a tener en cuenta."
+            else -> "No hay información disponible para esta semana."
+        }
     }
-}
 
-fun obtenerEmoji(categoria: String): String {
-    return when (categoria) {
-        CategoriaInformativa.HIDRATACION -> "💧"
-        CategoriaInformativa.MASCOTAS -> "🐾"
-        CategoriaInformativa.ALIMENTACION -> "🥦"
-        CategoriaInformativa.SALUD -> "🩺"
-        CategoriaInformativa.RECURSOS -> "📚"
-        else -> "✨"
+    fun obtenerEmoji(categoria: String): String {
+        return when (categoria) {
+            CategoriaInformativa.HIDRATACION -> "💧"
+            CategoriaInformativa.MASCOTAS -> "🐾"
+            CategoriaInformativa.ALIMENTACION -> "🥦"
+            CategoriaInformativa.SALUD -> "🩺"
+            CategoriaInformativa.RECURSOS -> "📚"
+            else -> "✨"
+        }
     }
-}
+
 
 
 
