@@ -4,15 +4,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -33,6 +40,7 @@ import com.example.damagotchi_26.ui.Color.Color.CardGray
 import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
 import com.example.damagotchi_26.ui.Color.Color.PurpleBtn
 import com.example.damagotchi_26.data.Post
+import com.example.damagotchi_26.ui.Color.Color.YellowStar
 
 
 @Composable
@@ -338,8 +346,9 @@ fun WeekHighlightCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(26.dp),
+        modifier = modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(
             containerColor = PurpleBtn.copy(alpha = 0.16f)
         ),
@@ -370,33 +379,51 @@ fun WeekHighlightCard(
         }
     }
 }
-
 @Composable
 fun SweetSectionCard(
     title: String,
     emoji: String,
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    esFavorito: Boolean = false,
+    colorFondo: Color = CardGray,
+    onFavoritoClick: (() -> Unit)? = null
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 15.dp),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(
-            containerColor = CardGray
-        )
+            containerColor = colorFondo
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = "$emoji  $title",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = PurpleBlueText
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = "$emoji  $title",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = PurpleBlueText,
+                    modifier = Modifier.weight(1f)
+                )
+
+                if (onFavoritoClick != null) {
+                    IconButton(onClick = onFavoritoClick) {
+                        Icon(
+                            imageVector = if (esFavorito) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                            contentDescription = "Favorito",
+                            tint = if (esFavorito) YellowStar else PurpleBlueText
+                        )
+                    }
+                }
+            }
 
             Text(
                 text = text,

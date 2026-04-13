@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -27,11 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
 import com.example.damagotchi_26.ui.components.AuthBackground
 import com.example.damagotchi_26.ui.components.BackTextButton
 import com.example.damagotchi_26.ui.components.PrimaryAuthButton
-import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
-
 
 @Composable
 fun CrearAnuncioAdmin(
@@ -57,7 +56,7 @@ fun CrearAnuncioAdmin(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
+                    .padding(bottom = 30.dp),
                 contentAlignment = Alignment.Center
             ) {
                 BackTextButton(onClick = onBack)
@@ -111,13 +110,6 @@ private fun CrearAnuncioAdminContent(
     onUrlFuenteChange: (String) -> Unit,
     onPublishClick: () -> Unit
 ) {
-    val camposCompletos = titulo.isNotBlank() &&
-            semanaGestacion.isNotBlank() &&
-            categoria.isNotBlank() &&
-            contenido.isNotBlank() &&
-            fuente.isNotBlank() &&
-            urlFuente.isNotBlank()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -127,7 +119,7 @@ private fun CrearAnuncioAdminContent(
         verticalArrangement = Arrangement.Top
     ) {
         Text(
-            text = "Nuevo anuncio de seguimiento",
+            text = "Nuevo anuncio",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = PurpleBlueText,
@@ -137,7 +129,7 @@ private fun CrearAnuncioAdminContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Añade contenido validado para informar a las familias según la semana de gestación.",
+            text = "Añade contenido validado para informar a las familias.",
             style = MaterialTheme.typography.bodyMedium
         )
 

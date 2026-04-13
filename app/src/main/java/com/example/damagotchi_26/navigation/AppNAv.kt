@@ -1,6 +1,8 @@
 package com.example.damagotchi_26.navigation
 
 import CommunityScreen
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
@@ -23,8 +25,10 @@ import com.example.damagotchi_26.ui.theme.Welcome
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import com.example.damagotchi_26.data.AnuncioSeguimiento
 import com.example.damagotchi_26.data.UserPreferences
 import com.example.damagotchi_26.data.getUserProfile
+import com.example.damagotchi_26.repository.saveAnuncioSeguimiento
 import com.example.damagotchi_26.ui.Community.CreatePostScreen
 import com.example.damagotchi_26.ui.Community.PostDetailScreen
 import com.example.damagotchi_26.ui.Menu.Menu
@@ -61,6 +65,14 @@ fun AppNav(
 
                             val uid = FirebaseAuth.getInstance().currentUser?.uid
 
+                            /*  Toast.makeText(
+                                context,
+                                "UID login: $uid",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            Log.d("LOGIN_UID", "UID login: $uid") */
+
                             if (uid != null) {
                                 getUserProfile(uid) { profile, profileError ->
                                     if (profile != null) {
@@ -74,27 +86,44 @@ fun AppNav(
 
                                         navController.navigate(destino) {
                                             popUpTo(Route.Login.path) { inclusive = true }
-                                            launchSingleTop = true //Evita abrir pantallas duplicadas
+                                            launchSingleTop =
+                                                true //Evita abrir pantallas duplicadas
 
                                         }
 
+
                                     } else {
-                                        println("Error cargando perfil: ${profileError ?: "desconocido"}")
+                                        Toast.makeText(
+                                            context,
+                                            profileError ?: "Error cargando perfil",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                     }
                                 }
                             } else {
-                                println("No se pudo obtener el uid del usuario")
+                                Toast.makeText(
+                                    context,
+                                    "No se pudo obtener el usuario",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
+
                         } else {
-                            println("Login error: ${error ?: "desconocido"}")
+                            Toast.makeText(
+                                context,
+                                error ?: "Error al iniciar sesión",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 },
-                onGoRegister = { navController.navigate(Route.Register.path)
-                { launchSingleTop = true }
+                onGoRegister = {
+                    navController.navigate(Route.Register.path)
+                    { launchSingleTop = true }
                 },
-                onForgotPassword = { navController.navigate(Route.ResetPassword.path)
-                { launchSingleTop = true }
+                onForgotPassword = {
+                    navController.navigate(Route.ResetPassword.path)
+                    { launchSingleTop = true }
                 }
             )
         }
@@ -191,14 +220,17 @@ fun AppNav(
             Menu(
                 rol = userProfile?.rol ?: "Otro",
                 nombre = userProfile?.nombre ?: "Usuario",
-                onPlayClick = { navController.navigate(Route.Rooms.path)
-                { launchSingleTop = true } //Evita abrir pantallas duplicadas
-                  },
-                onCommunityClick = { navController.navigate(Route.Community.path)
-                { launchSingleTop = true }
+                onPlayClick = {
+                    navController.navigate(Route.Rooms.path)
+                    { launchSingleTop = true } //Evita abrir pantallas duplicadas
                 },
-                onSeguimientoClick = { navController.navigate(Route.SeguimientoScreem.path)
-                { launchSingleTop = true }
+                onCommunityClick = {
+                    navController.navigate(Route.Community.path)
+                    { launchSingleTop = true }
+                },
+                onSeguimientoClick = {
+                    navController.navigate(Route.SeguimientoScreem.path)
+                    { launchSingleTop = true }
 
                 }
             )
@@ -207,7 +239,8 @@ fun AppNav(
         composable(Route.Community.path) {
             CommunityScreen(
                 onCreatePostClick = { navController.navigate(Route.CreatePost.path) },
-                onPostClick = { postId -> navController.navigate("detalle_post/$postId")
+                onPostClick = { postId ->
+                    navController.navigate("detalle_post/$postId")
                 },
                 onBack = { navController.popBackStack() }
 
@@ -250,11 +283,50 @@ fun AppNav(
             CrearAnuncioAdmin(
                 onBack = { navController.popBackStack() },
                 onPublishClick = { titulo, semana, categoria, contenido, fuente, url ->
-                    // guardar en Firebase
-                    navController.popBackStack()
+                    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+                    val semanaInt = semana.toIntOrNull()
+
+                    if (semanaInt == null) {
+                        Toast.makeText(
+                            context,
+                            "La semana de gestación debe ser un número",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        val anuncio = AnuncioSeguimiento(
+                            titulo = titulo,
+                            semanaGestacion = semanaInt,
+                            categoria = categoria,
+                            contenido = contenido,
+                            fuente = fuente,
+                            urlFuente = url,
+                            autorUid = uid
+                        )
+
+                        saveAnuncioSeguimiento(anuncio) { ok, error ->
+                            if (ok) {
+                                Toast.makeText(
+                                    context,
+                                    "Anuncio guardado correctamente",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                navController.popBackStack()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    error ?: "Error al guardar anuncio",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    }
                 }
             )
         }
+
+
 
     }
 }

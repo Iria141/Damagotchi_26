@@ -1,92 +1,86 @@
 package com.example.damagotchi_26.ui.login
 
-import androidx.compose.foundation.layout.*
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
 import com.example.damagotchi_26.ui.components.AuthBackground
 import com.example.damagotchi_26.ui.components.AuthCard
-import com.example.damagotchi_26.ui.components.textStyle
-import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
 import com.example.damagotchi_26.ui.components.AuthTextField
+import com.example.damagotchi_26.ui.components.textStyle
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 import com.google.firebase.auth.FirebaseAuth
 
-
-
-// FUNCIÓN QUE REALIZA EL LOGIN EN FIREBASE
-// email -> correo del usuario
-// password -> contraseña
-// onResult -> devuelve si el login fue correcto o no
-
 fun login(email: String, password: String, onResult: (Boolean, String?) -> Unit) {
-
-    // Obtiene la instancia de autenticación de Firebase
     val auth = FirebaseAuth.getInstance()
-    // Intenta iniciar sesión con email y contraseña
-    auth.signInWithEmailAndPassword(email, password)
 
-        // Escucha cuando termina el proceso
+    auth.signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
-            // Si el login fue correcto
-            if (task.isSuccessful)
+            if (task.isSuccessful) {
+                val user = FirebaseAuth.getInstance().currentUser
+                Log.d("LOGIN", "Login correcto: ${user?.email}")
                 onResult(true, null)
-            // Si hubo error devuelve el mensaje
-            else
-                onResult(false, task.exception?.message)
+            } else {
+                val error = task.exception?.message
+                Log.e("LOGIN", "Error: $error")
+                onResult(false, error)
+            }
         }
 }
 
-
-// COMPOSABLE QUE REPRESENTA LA PANTALLA DE LOGIN
 @Composable
 fun Login(
-
     transicionViewModel: TransicionViewModel? = null,
-
     onLogin: (user: String, pass: String, remember: Boolean) -> Unit,
     onGoRegister: () -> Unit,
     onForgotPassword: () -> Unit
 ) {
-
-    // ESTADO DEL CAMPO EMAIL
     var user by remember { mutableStateOf("") }
-
-    // ESTADO DEL CAMPO CONTRASEÑA
     var pass by remember { mutableStateOf("") }
-
-    // ESTADO DEL CHECKBOX "RECUÉRDAME"
     var rememberMe by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
 
-    // FONDO GENERAL DE LA PANTALLA (TU COMPONENTE PERSONALIZADO)
     AuthBackground {
-
-        // COLUMNA PRINCIPAL
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center
         ) {
-
-            // ESPACIO SUPERIOR
             Spacer(Modifier.height(16.dp))
 
-
             AuthCard {
-                // CAMPO EMAIL
                 AuthTextField(
                     value = user,
                     onValueChange = { user = it },
                     label = "Email"
                 )
 
-                // CAMPO CONTRASEÑA
                 AuthTextField(
                     value = pass,
                     onValueChange = { pass = it },
@@ -94,19 +88,14 @@ fun Login(
                     isPassword = true
                 )
 
-                // FILA PARA CHECKBOX Y RECUPERAR CONTRASEÑA
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 25.dp),
-
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-
-                    // CHECKBOX RECUÉRDAME
                     Row(verticalAlignment = Alignment.CenterVertically) {
-
                         Checkbox(
                             modifier = Modifier.size(22.dp),
                             checked = rememberMe,
@@ -120,8 +109,6 @@ fun Login(
                         )
                     }
 
-
-                    // BOTÓN RESTABLECER CONTRASEÑA
                     TextButton(
                         onClick = onForgotPassword,
                         contentPadding = PaddingValues(0.dp),
@@ -136,18 +123,18 @@ fun Login(
                     }
                 }
 
-
-                // BOTÓN INICIAR SESIÓN
                 Button(
                     onClick = {
-                        // VALIDAMOS QUE LOS CAMPOS NO ESTÉN VACÍOS
-                        if (user.isNotBlank() && pass.isNotBlank()) {
-
-                            // LLAMAMOS A LA FUNCIÓN DE LOGIN
+                        if (user.isBlank() || pass.isBlank()) {
+                            Toast.makeText(
+                                context,
+                                "Introduce email y contraseña",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
                             onLogin(user, pass, rememberMe)
                         }
                     },
-
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 90.dp)
@@ -155,19 +142,17 @@ fun Login(
                     Text("Iniciar Sesión")
                 }
 
-
-                // BOTÓN PARA IR A REGISTRO
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-
                     TextButton(
                         onClick = onGoRegister,
                         contentPadding = PaddingValues(0.dp),
-                        colors = ButtonDefaults.textButtonColors(contentColor = PurpleBlueText)
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = PurpleBlueText
+                        )
                     ) {
-
                         Text(
                             text = "No tengo cuenta. DAR DE ALTA",
                             style = textStyle
@@ -179,8 +164,6 @@ fun Login(
     }
 }
 
-
-// PREVISUALIZACIÓN DE LA PANTALLA LOGIN
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LoginPreview() {
@@ -188,8 +171,8 @@ fun LoginPreview() {
         Surface {
             Login(
                 onLogin = { _, _, _ -> },
-                onGoRegister = { },
-                onForgotPassword = { }
+                onGoRegister = {},
+                onForgotPassword = {}
             )
         }
     }
