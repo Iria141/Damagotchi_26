@@ -7,7 +7,7 @@ data class UserProfile(
     val nombre: String = "",
     val fechaNacimiento: String = "",
     val rol: String = "",
-    val semanaGestacion: String = "",
+    val fechaUltimaRegla: Long = 0L,
     val sexoBebe: String = "",
     val email: String = ""
 )
@@ -50,4 +50,7 @@ fun getUserProfile(
         .addOnFailureListener { e ->
             onResult(null, e.message)
         }
+
+
+
 }

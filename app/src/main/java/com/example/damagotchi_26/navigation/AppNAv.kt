@@ -1,7 +1,7 @@
 package com.example.damagotchi_26.navigation
 
 import CommunityScreen
-import android.util.Log
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -28,11 +28,12 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.damagotchi_26.data.AnuncioSeguimiento
 import com.example.damagotchi_26.data.UserPreferences
 import com.example.damagotchi_26.data.getUserProfile
-import com.example.damagotchi_26.repository.saveAnuncioSeguimiento
+import com.example.damagotchi_26.repository.agregarAnuncioSeguimiento
 import com.example.damagotchi_26.ui.Community.CreatePostScreen
 import com.example.damagotchi_26.ui.Community.PostDetailScreen
 import com.example.damagotchi_26.ui.Menu.Menu
 import com.example.damagotchi_26.ui.MiEmbarazo.CrearAnuncioAdmin
+import com.example.damagotchi_26.ui.MiEmbarazo.DetalleAnuncioScreen
 import com.example.damagotchi_26.ui.MiEmbarazo.SeguimientoScreem
 
 
@@ -141,7 +142,7 @@ fun AppNav(
         composable(Route.Register.path) {
 
             NewUser(
-                onCreate = { nombre, fecha, rol, semana, sexo, email, pass ->
+                onCreate = { nombre, fecha, rol, fechaUltimaRegla, sexo, email, pass ->
                     register(email, pass) { ok, error ->
                         if (ok) {
                             val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -151,7 +152,7 @@ fun AppNav(
                                     nombre = nombre,
                                     fechaNacimiento = fecha,
                                     rol = rol,
-                                    semanaGestacion = semana,
+                                    fechaUltimaRegla = fechaUltimaRegla,
                                     sexoBebe = sexo,
                                     email = email
                                 )
@@ -270,15 +271,25 @@ fun AppNav(
         composable(Route.SeguimientoScreem.path) {
             SeguimientoScreem(
                 rol = userProfile?.rol ?: "Otro",
-                semanaReal = userProfile?.semanaGestacion?.toIntOrNull() ?: 1,
+                fechaUltimaRegla = userProfile?.fechaUltimaRegla ?: 0L,
                 nombre = userProfile?.nombre ?: "Usuario",
                 onBack = { navController.popBackStack() },
                 onAddAnuncioClick = {
                     navController.navigate(Route.CrearAnuncioAdmin.path)
+                },
+                onAnuncioClick = { titulo, categoria, contenido, semanaGestacion, fuente, urlFuente ->
+                    val ruta = "detalle_anuncio/" +
+                            Uri.encode(titulo) + "/" +
+                            Uri.encode(categoria) + "/" +
+                            Uri.encode(contenido) + "/" +
+                            semanaGestacion + "/" +
+                            Uri.encode(fuente) + "/" +
+                            Uri.encode(urlFuente)
+
+                    navController.navigate(ruta)
                 }
             )
         }
-
         composable(Route.CrearAnuncioAdmin.path) {
             CrearAnuncioAdmin(
                 onBack = { navController.popBackStack() },
@@ -304,8 +315,9 @@ fun AppNav(
                             autorUid = uid
                         )
 
-                        saveAnuncioSeguimiento(anuncio) { ok, error ->
-                            if (ok) {
+                        agregarAnuncioSeguimiento(
+                            anuncio = anuncio,
+                            onOk = {
                                 Toast.makeText(
                                     context,
                                     "Anuncio guardado correctamente",
@@ -313,16 +325,36 @@ fun AppNav(
                                 ).show()
 
                                 navController.popBackStack()
-                            } else {
+                            },
+                            onError = { error ->
                                 Toast.makeText(
                                     context,
-                                    error ?: "Error al guardar anuncio",
+                                    error,
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
-                        }
+                        )
                     }
                 }
+            )
+        }
+
+        composable(Route.DetalleAnuncio.path) { backStackEntry ->
+            val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
+            val categoria = backStackEntry.arguments?.getString("categoria") ?: ""
+            val contenido = backStackEntry.arguments?.getString("contenido") ?: ""
+            val semanaGestacion = backStackEntry.arguments?.getString("semanaGestacion")?.toIntOrNull() ?: 1
+            val fuente = backStackEntry.arguments?.getString("fuente") ?: ""
+            val urlFuente = backStackEntry.arguments?.getString("urlFuente") ?: ""
+
+            DetalleAnuncioScreen(
+                titulo = titulo,
+                categoria = categoria,
+                contenido = contenido,
+                semanaGestacion = semanaGestacion,
+                fuente = fuente,
+                urlFuente = urlFuente,
+                onBack = { navController.popBackStack() }
             )
         }
 

@@ -6,16 +6,16 @@ import com.google.firebase.firestore.FirebaseFirestore
 class PublicacionesInformativasRepository {
 
     private val db = FirebaseFirestore.getInstance()
-    private val coleccion = db.collection("publicacionesInfo")
+    private val collection = db.collection("publicaciones_informativas")
 
     fun obtenerPublicaciones(
         onResultado: (List<PublicacionInformativa>) -> Unit,
         onError: (Exception) -> Unit
     ) {
-        coleccion
+        collection
             .get()
-            .addOnSuccessListener { resultado ->
-                val lista = resultado.documents.mapNotNull { doc ->
+            .addOnSuccessListener { result ->
+                val lista = result.documents.mapNotNull { doc ->
                     doc.toObject(PublicacionInformativa::class.java)?.copy(id = doc.id)
                 }
                 onResultado(lista)
@@ -23,5 +23,16 @@ class PublicacionesInformativasRepository {
             .addOnFailureListener { e ->
                 onError(e)
             }
+    }
+
+    fun agregarPublicacion(
+        publicacion: PublicacionInformativa,
+        onOk: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        collection
+            .add(publicacion)
+            .addOnSuccessListener { onOk() }
+            .addOnFailureListener { e -> onError(e.message ?: "Error al guardar publicación") }
     }
 }

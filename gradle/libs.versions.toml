@@ -15,6 +15,7 @@ material3 = "1.4.0"
 firebaseAuthKtx = "24.0.1"
 firebaseBom = "34.10.0"
 foundationLayoutVersion = "1.10.4"
+androidxFoundationLayout = "1.10.6"
 
 
 [libraries]
@@ -39,6 +40,7 @@ androidx-compose-remote-creation-compose = { group = "androidx.compose.remote", 
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayoutVersion" }
+foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "androidxFoundationLayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

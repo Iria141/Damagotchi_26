@@ -2,6 +2,7 @@ package com.example.damagotchi_26.ui.login
 
 import android.util.Patterns
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,10 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,28 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.damagotchi_26.ui.components.AuthBackground
 import com.example.damagotchi_26.ui.components.AuthCard
 import com.example.damagotchi_26.ui.components.AuthTextField
-import com.example.damagotchi_26.ui.components.PrimaryAuthButton
+import com.example.damagotchi_26.ui.components.BackTextButton
 import com.google.firebase.auth.FirebaseAuth
-
-fun resetPassword(email: String, onResult: (Boolean, String?) -> Unit) {
-
-    val auth = FirebaseAuth.getInstance()
-
-    auth.sendPasswordResetEmail(email)
-        .addOnCompleteListener { task ->
-
-            if (task.isSuccessful)
-                onResult(true, null)
-            else
-                onResult(false, task.exception?.message)
-        }
-}
 
 
 @Composable
@@ -52,18 +37,13 @@ fun ResetPassword(
 ) {
     var email by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf(false) }
-    //mensaje emergente
     var showDialog by remember { mutableStateOf(false) }
 
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = {
-                Text("Correo enviado")
-            },
-            text = {
-                Text("Puede tardar unos minutos en llegar.")
-            },
+            title = { Text("Correo enviado") },
+            text = { Text("Puede tardar unos minutos en llegar.") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -77,57 +57,69 @@ fun ResetPassword(
         )
     }
 
-    AuthBackground {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center
-        ) {
-            AuthCard {
-                AuthTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = "Email",
-                    isError = emailError,
-                    errorMessage = "Email no válido"
-                )
+    fun resetPassword(email: String, onResult: (Boolean, String?) -> Unit) {
+        val auth = FirebaseAuth.getInstance()
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful)
+                    onResult(true, null)
+                else
+                    onResult(false, task.exception?.message)
             }
+    }
 
-            Spacer(Modifier.height(16.dp))
+    Scaffold(
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                BackTextButton(onClick = onBack) // 👈 centrado abajo
+            }
+        }
+    ) { paddingValues ->
+        AuthBackground {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AuthCard {
+                    AuthTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = "Email",
+                        isError = emailError,
+                        errorMessage = "Email no válido"
+                    )
+                }
 
-            Button(
-                onClick = {
-                    emailError = false
-                    when {
-                        email.isBlank() -> {
-                            emailError = true
-                        }
+                Spacer(Modifier.height(16.dp))
 
-                        !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
-                            emailError = true
-                        }
-
-                        else -> {
-                            resetPassword(email) { ok, _ ->
-                                if (ok) {
-                                    showDialog = true
+                Button(
+                    onClick = {
+                        emailError = false
+                        when {
+                            email.isBlank() -> emailError = true
+                            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> emailError = true
+                            else -> {
+                                resetPassword(email) { ok, _ ->
+                                    if (ok) showDialog = true
                                 }
                             }
                         }
-                    }
-                },
-                enabled = email.isNotBlank(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 100.dp)
-            ) {
-                Text("Enviar email")
-            }
-
-            TextButton(
-                onClick = onBack,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text("Volver")
+                    },
+                    enabled = email.isNotBlank(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 100.dp)
+                ) {
+                    Text("Enviar email")
+                }
             }
         }
     }

@@ -1,40 +1,34 @@
 package com.example.damagotchi_26.repository
 
-
 import com.example.damagotchi_26.data.AnuncioSeguimiento
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.FirebaseFirestore
 
-fun saveAnuncioSeguimiento(
-    anuncio: AnuncioSeguimiento,
-    onResult: (Boolean, String?) -> Unit
-) {
-    val db = Firebase.firestore
-
-    db.collection("anuncios_seguimiento")
-        .add(anuncio)
-        .addOnSuccessListener {
-            onResult(true, null)
-        }
-        .addOnFailureListener { e ->
-            onResult(false, e.message)
-        }
-}
+private val db = FirebaseFirestore.getInstance()
+private val anunciosCollection = db.collection("anuncios_seguimiento")
 
 fun getAnunciosSeguimiento(
     onResult: (List<AnuncioSeguimiento>, String?) -> Unit
 ) {
-    val db = Firebase.firestore
-
-    db.collection("anuncios_seguimiento")
+    anunciosCollection
         .get()
         .addOnSuccessListener { result ->
-            val anuncios = result.documents.mapNotNull { doc ->
-                doc.toObject(AnuncioSeguimiento::class.java)
+            val lista = result.documents.mapNotNull { doc ->
+                doc.toObject(AnuncioSeguimiento::class.java)?.copy(id = doc.id)
             }
-            onResult(anuncios, null)
+            onResult(lista, null)
         }
         .addOnFailureListener { e ->
-            onResult(emptyList(), e.message)
+            onResult(emptyList(), e.message ?: "Error al cargar anuncios")
         }
+}
+
+fun agregarAnuncioSeguimiento(
+    anuncio: AnuncioSeguimiento,
+    onOk: () -> Unit,
+    onError: (String) -> Unit
+) {
+    anunciosCollection
+        .add(anuncio)
+        .addOnSuccessListener { onOk() }
+        .addOnFailureListener { e -> onError(e.message ?: "Error al guardar anuncio") }
 }

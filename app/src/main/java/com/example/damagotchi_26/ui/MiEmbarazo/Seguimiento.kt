@@ -1,14 +1,12 @@
 package com.example.damagotchi_26.ui.MiEmbarazo
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.StarBorder
+import android.graphics.Color.red
 import android.widget.Toast
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,50 +14,61 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.damagotchi_26.data.AnuncioSeguimiento
 import com.example.damagotchi_26.data.CategoriaInformativa
+import com.example.damagotchi_26.repository.FavoritoSeguimientoRepository
+import com.example.damagotchi_26.repository.getAnunciosSeguimiento
 import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
 import com.example.damagotchi_26.ui.components.AuthBackground
+import com.example.damagotchi_26.ui.components.BackTextButton
+import com.example.damagotchi_26.ui.components.PrimaryAuthButton
 import com.example.damagotchi_26.ui.components.SoftDisclaimer
 import com.example.damagotchi_26.ui.components.SweetSectionCard
 import com.example.damagotchi_26.ui.components.WeekHighlightCard
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
-import com.example.damagotchi_26.data.AnuncioSeguimiento
-import com.example.damagotchi_26.data.PublicacionInformativa
-import com.example.damagotchi_26.repository.PublicacionesInformativasRepository
-import com.example.damagotchi_26.repository.getAnunciosSeguimiento
-import com.example.damagotchi_26.ui.Color.Color.CardSoftBlue
-import com.example.damagotchi_26.ui.Color.Color.CardSoftPink
-import com.example.damagotchi_26.ui.components.BackTextButton
-import com.example.damagotchi_26.ui.components.PrimaryAuthButton
+import com.example.damagotchi_26.utils.calcularDiaYSemana
 
 @Composable
 fun SeguimientoScreem(
     rol: String,
-    semanaReal: Int,
-    nombre: String = "",
+    fechaUltimaRegla: Long,
+    nombre: String,
     onBack: () -> Unit = {},
     onAddAnuncioClick: () -> Unit = {},
+    onAnuncioClick: (
+        titulo: String,
+        categoria: String,
+        contenido: String,
+        semanaGestacion: Int,
+        fuente: String,
+        urlFuente: String
+    ) -> Unit = { _, _, _, _, _, _ -> },
 ) {
     val esMama = rol.lowercase() == "mamá" || rol.lowercase() == "mama"
     val titulo = if (esMama) "Mi embarazo" else "Seguimiento"
-    val trimestre = obtenerTrimestreTexto(semanaReal)
-    val mensajeSemana = obtenerMensajeSemana(semanaReal)
+
+    val (dia, semanaReal) = calcularDiaYSemana(fechaUltimaRegla)
+
     val trimestreNumero = obtenerTrimestreNumero(semanaReal)
     val trimestreTexto = when (trimestreNumero) {
         1 -> "Primer trimestre"
@@ -68,47 +77,32 @@ fun SeguimientoScreem(
         else -> "Trimestre desconocido"
     }
 
-    val repositorio = remember { PublicacionesInformativasRepository() }
-    var publicaciones by remember { mutableStateOf<List<PublicacionInformativa>>(emptyList()) }
+    val favoritoRepository = remember { FavoritoSeguimientoRepository() }
+
     var cargando by remember { mutableStateOf(true) }
     var errorCarga by remember { mutableStateOf<String?>(null) }
+
     val context = LocalContext.current
     val anuncios = remember { mutableStateListOf<AnuncioSeguimiento>() }
-
     val favoritos = remember { mutableStateListOf<String>() }
+
     var busqueda by remember { mutableStateOf("") }
     var soloFavoritos by remember { mutableStateOf(false) }
+    var categoriaSeleccionada by remember { mutableStateOf<String?>(null) }
 
-    val anunciosFiltrados = anuncios.filter {
-        it.titulo.contains(busqueda, true) ||
-                it.contenido.contains(busqueda, true) ||
-                it.categoria.contains(busqueda, true)
-    }
-
-
-
-    LaunchedEffect(Unit) {
-        repositorio.obtenerPublicaciones(
-            onResultado = { lista ->
-                println("DATOS FIREBASE: ${lista.size}")
-                publicaciones = lista
-                cargando = false
-            },
-            onError = { error ->
-                errorCarga = error.message
-                cargando = false
-            }
-        )
-    }
+    val categoriasFiltro = listOf(
+        null to "Todas",
+        CategoriaInformativa.HIDRATACION to "💧 Hidratación",
+        CategoriaInformativa.MASCOTAS to "🐾 Mascotas",
+        CategoriaInformativa.ALIMENTACION to "🥦 Alimentación",
+        CategoriaInformativa.SALUD to "🩺 Salud",
+        CategoriaInformativa.RECURSOS to "📚 Recursos"
+    )
 
     LaunchedEffect(Unit) {
         getAnunciosSeguimiento { lista, error ->
             if (error != null) {
-                Toast.makeText(
-                    context,
-                    error,
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(context, error, Toast.LENGTH_LONG).show()
             } else {
                 anuncios.clear()
                 anuncios.addAll(lista)
@@ -116,15 +110,29 @@ fun SeguimientoScreem(
         }
     }
 
+    LaunchedEffect(Unit) {
+        favoritoRepository.obtenerFavoritos(
+            onResultado = { lista ->
+                favoritos.clear()
+                favoritos.addAll(lista)
+            },
+            onError = { error ->
+                Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+            }
+        )
+    }
 
-    val publicacionesFiltradas = publicaciones
-        .filter { pub ->
-            semanaReal in pub.semanaInicio..pub.semanaFin &&
-                    (pub.rolDestino.isEmpty() || rol in pub.rolDestino)
+    val anunciosFiltrados = anuncios
+        .filter { anuncio ->
+            anuncio.semanaGestacion <= semanaReal &&
+                    (categoriaSeleccionada == null || anuncio.categoria.equals(categoriaSeleccionada, ignoreCase = true)) &&
+                    (
+                            anuncio.titulo.contains(busqueda, ignoreCase = true) ||
+                                    anuncio.contenido.contains(busqueda, ignoreCase = true) ||
+                                    anuncio.categoria.contains(busqueda, ignoreCase = true)
+                            )
         }
-        .sortedByDescending { it.destacada }
-
-
+        .sortedByDescending { it.semanaGestacion }
     Scaffold(
         bottomBar = {
             Box(
@@ -143,13 +151,11 @@ fun SeguimientoScreem(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .padding(top = 8.dp)
+                        .padding(horizontal = 8.dp, vertical = 8.dp)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {
-
-
                     Text(
                         text = "🌸 $titulo 🌸",
                         modifier = Modifier.fillMaxWidth(),
@@ -163,7 +169,7 @@ fun SeguimientoScreem(
 
                     WeekHighlightCard(
                         title = "Tu momento actual",
-                        weekText = "Semana $semanaReal",
+                        weekText = "Semana $semanaReal · Día $dia",
                         subtitle = trimestreTexto
                     )
 
@@ -178,35 +184,55 @@ fun SeguimientoScreem(
                             .padding(horizontal = 24.dp)
                     )
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
                             .padding(horizontal = 24.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Favoritos ⭐",
-                            style = MaterialTheme.typography.bodyLarge
+                        //Todas
+                        FilterChip(
+                            selected = categoriaSeleccionada == null && !soloFavoritos,
+                            onClick = {
+                                categoriaSeleccionada = null
+                                soloFavoritos = false
+                            },
+                            label = { Text(text = "Todas", style = MaterialTheme.typography.labelMedium) }
                         )
 
-                        Switch(
-                            checked = soloFavoritos,
-                            onCheckedChange = { soloFavoritos = it }
+                        //Favoritos
+                        FilterChip(
+                            selected = soloFavoritos,
+                            onClick = { soloFavoritos = !soloFavoritos },
+                            label = { Text(text = "⭐ Favoritos", style = MaterialTheme.typography.labelMedium) }
                         )
+
+                        //Categorías
+                        categoriasFiltro
+                            .filter { (valor, _) -> valor != null } // excluye "Todas" si la tenías en la lista
+                            .forEach { (valor, etiqueta) ->
+                                FilterChip(
+                                    selected = categoriaSeleccionada == valor,
+                                    onClick = {
+                                        categoriaSeleccionada = if (categoriaSeleccionada == valor) null else valor
+                                        soloFavoritos = false // deselecciona Fav al elegir categoría
+                                    },
+                                    label = { Text(text = etiqueta, style = MaterialTheme.typography.labelMedium) }
+                                )
+                            }
+
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-
-
                     if (rol.lowercase() == "admin") {
                         PrimaryAuthButton(
                             text = "Añadir anuncio",
-                            onClick = onAddAnuncioClick,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 24.dp)
+                            onClick = onAddAnuncioClick
                         )
                     }
 
@@ -228,55 +254,53 @@ fun SeguimientoScreem(
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    publicacionesFiltradas.forEach { pub ->
-                        val esFavorito = favoritos.contains(pub.titulo)
-
-                        if (!soloFavoritos || esFavorito) {
-                            SweetSectionCard(
-                                title = pub.titulo,
-                                emoji = obtenerEmoji(pub.categoria),
-                                text = pub.contenido,
-                                modifier = Modifier.padding(horizontal = 24.dp),
-                                esFavorito = esFavorito,
-                                onFavoritoClick = {
-                                    if (esFavorito) {
-                                        favoritos.remove(pub.titulo)
-                                    } else {
-                                        favoritos.add(pub.titulo)
-                                    }
-                                }
-                            )
-
-                            Spacer(modifier = Modifier.height(14.dp))
-                        }
-                    }
 
                     anunciosFiltrados.forEach { anuncio ->
-                        val esFavorito = favoritos.contains(anuncio.titulo)
+                        val esFavorito = favoritos.contains(anuncio.id)
 
                         if (!soloFavoritos || esFavorito) {
                             SweetSectionCard(
                                 title = anuncio.titulo,
                                 emoji = obtenerEmoji(anuncio.categoria),
-                                text = anuncio.contenido,
-                                modifier = Modifier.padding(horizontal = 24.dp),
+                                text = anuncio.contenido.take(128) + "...",
                                 esFavorito = esFavorito,
+                                backgroundColor = obtenerColorCategoria(anuncio.categoria),
                                 onFavoritoClick = {
                                     if (esFavorito) {
-                                        favoritos.remove(anuncio.titulo)
+                                        favoritoRepository.quitarFavorito(
+                                            idPublicacion = anuncio.id,
+                                            onOk = { favoritos.remove(anuncio.id) },
+                                            onError = { error ->
+                                                Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                            }
+                                        )
                                     } else {
-                                        favoritos.add(anuncio.titulo)
+                                        favoritoRepository.agregarFavorito(
+                                            idPublicacion = anuncio.id,
+                                            onOk = { favoritos.add(anuncio.id) },
+                                            onError = { error ->
+                                                Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                            }
+                                        )
                                     }
-                                }
+                                },
+                                onClick = {
+                                    onAnuncioClick(
+                                        anuncio.titulo,
+                                        anuncio.categoria,
+                                        anuncio.contenido,
+                                        anuncio.semanaGestacion,
+                                        anuncio.fuente,
+                                        anuncio.urlFuente
+                                    )
+                                },
                             )
 
                             Spacer(modifier = Modifier.height(14.dp))
                         }
                     }
-                    Spacer(modifier = Modifier.height(14.dp))
 
-
-                    if (!cargando && publicacionesFiltradas.isEmpty() && anunciosFiltrados.isEmpty()) {
+                    if (!cargando && anunciosFiltrados.isEmpty()) {
                         SweetSectionCard(
                             title = "Aún no hay contenido",
                             emoji = "✨",
@@ -287,9 +311,6 @@ fun SeguimientoScreem(
                     Spacer(modifier = Modifier.height(14.dp))
 
                     SoftDisclaimer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
                         text = "La información mostrada es orientativa y no sustituye la valoración de profesionales de la salud."
                     )
                 }
@@ -297,7 +318,6 @@ fun SeguimientoScreem(
         }
     }
 }
-
 
 fun obtenerTrimestreNumero(semana: Int): Int {
     return when (semana) {
@@ -308,23 +328,17 @@ fun obtenerTrimestreNumero(semana: Int): Int {
     }
 }
 
-fun obtenerTrimestreTexto(semana: Int): String {
-    return when (semana) {
-        in 1..13 -> "Primer trimestre"
-        in 14..27 -> "Segundo trimestre"
-        in 28..40 -> "Tercer trimestre"
-        else -> "Semana fuera de rango"
+fun obtenerColorCategoria(categoria: String): Color {
+    return when (categoria.lowercase().trim()) {
+        "hidratacion" -> Color(0xFFD6EFFF)
+        "mascotas" -> Color(0xFFE1BEE7)
+        "alimentacion" -> Color(0xFFFFE0B2)
+        "salud" -> Color(0xFFF8BBD0)
+        "recursos" -> Color(0xFFFFECB3)
+        else -> Color(0xFFE0E0E0)
     }
 }
 
-fun obtenerMensajeSemana(semana: Int): String {
-    return when (semana) {
-        in 1..13 -> "Es una etapa de muchos cambios iniciales. Puede ser útil priorizar el descanso, resolver dudas frecuentes y mantener un seguimiento cercano."
-        in 14..27 -> "Suele ser una fase algo más estable. Es un buen momento para reforzar hábitos saludables y seguir aprendiendo sobre esta etapa."
-        in 28..40 -> "En esta etapa final puede apetecer más calma, preparación y acompañamiento. También puede ser útil revisar información práctica y señales a tener en cuenta."
-        else -> "No hay información disponible para esta semana."
-    }
-}
 
 fun obtenerEmoji(categoria: String): String {
     return when (categoria) {
@@ -337,15 +351,15 @@ fun obtenerEmoji(categoria: String): String {
     }
 }
 
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun SeguimientoScreenPreview() {
     MaterialTheme {
         SeguimientoScreem(
             rol = "mamá",
-            semanaReal = 28,
-            nombre = "Iria"
+            fechaUltimaRegla = 1735689600000L,
+            nombre = "Iria",
+            onAnuncioClick = { _, _, _, _, _, _ -> }
         )
     }
 }

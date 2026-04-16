@@ -14,6 +14,7 @@ data class PublicacionInformativa(
     val fechaCreacion: Long = System.currentTimeMillis(),
     val creadaAdmin: Boolean = true
 )
+
 object CategoriaInformativa {
     const val HIDRATACION = "hidratacion"
     const val MASCOTAS = "mascotas"
@@ -27,4 +28,3 @@ object RolUsuario {
     const val ACOMPANANTE = "acompañante"
     const val OTRO = "otro"
 }
-

@@ -50,7 +50,7 @@ fun AuthBackground(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 28.dp)
+            .padding(vertical = 24.dp)
             .background(com.example.damagotchi_26.ui.Color.Color.PinkBg),
         content = content
     )
@@ -81,13 +81,15 @@ fun AuthCard(
 fun PrimaryAuthButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = com.example.damagotchi_26.ui.Color.Color.PurpleBtn),
         shape = RoundedCornerShape(8.dp),
-        modifier = modifier.height(44.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(44.dp)
+            .padding(horizontal = 50.dp)
     ) {
         Text(text, color = Color.White)
     }
@@ -107,6 +109,7 @@ fun AuthTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     singleLine: Boolean = true,
     modifier: Modifier = Modifier
+
 ) {
     Column {
         OutlinedTextField(
@@ -131,9 +134,9 @@ fun AuthTextField(
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
 
 
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 15.dp),
+                .padding(horizontal = 24.dp),
 
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = CardGray,
@@ -179,7 +182,9 @@ fun AuthInfoBox(
             textAlign = TextAlign.Center,
             fontSize = 18.sp,
             color = Color.Gray,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
         )
     }
 }
@@ -301,7 +306,7 @@ fun MenuOptionCard(
         modifier = modifier
             .fillMaxWidth()
             .height(110.dp)
-            .padding(horizontal = 50.dp)
+            .padding(horizontal = 24.dp)
     ) {
         Column(
             modifier = Modifier
@@ -347,7 +352,8 @@ fun WeekHighlightCard(
 ) {
     Card(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(
             containerColor = PurpleBtn.copy(alpha = 0.16f)
@@ -355,7 +361,7 @@ fun WeekHighlightCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
@@ -386,19 +392,23 @@ fun SweetSectionCard(
     text: String,
     modifier: Modifier = Modifier,
     esFavorito: Boolean = false,
-    colorFondo: Color = CardGray,
+    onClick: () -> Unit = {},
+    backgroundColor: Color = Color(0xFFF5F5F5),
     onFavoritoClick: (() -> Unit)? = null
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorFondo
+            containerColor = backgroundColor
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
-            modifier = Modifier.padding(18.dp),
+            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
@@ -427,8 +437,8 @@ fun SweetSectionCard(
 
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyMedium,
-                color = PurpleBlueText
+                color = Color(0xFF5F5A66),
+                fontSize = 15.sp
             )
         }
     }
@@ -437,11 +447,11 @@ fun SweetSectionCard(
 @Composable
 fun SoftDisclaimer(
     text: String,
-    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 24.dp)
             .background(
                 color = Color.White.copy(alpha = 0.65f),
                 shape = RoundedCornerShape(18.dp)
@@ -463,7 +473,7 @@ fun BackTextButton(
     onClick: () -> Unit
 ) {
     val textStyle = TextStyle(
-        fontSize = 14.sp,
+        fontSize = 16.sp,
         color = PurpleBlueText,
         fontWeight = FontWeight.Normal
     )

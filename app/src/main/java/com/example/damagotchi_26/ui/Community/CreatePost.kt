@@ -106,9 +106,7 @@ fun CreatePostScreen(
                             }
                         },
                         label = "Contenido",
-                        singleLine = false,
-                        modifier = Modifier
-                            .height(200.dp)
+                        singleLine = false
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -143,10 +141,7 @@ fun CreatePostScreen(
                         text = "Publicar",
                         onClick = {
                             onPublishClick(title, content, selectedType)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 35.dp),
+                        }
                     )
                 }
             }

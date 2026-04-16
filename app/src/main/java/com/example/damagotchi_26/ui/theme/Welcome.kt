@@ -112,10 +112,7 @@ fun Welcome(
 
                     PrimaryAuthButton(
                         text = "¡Comenzamos!",
-                        onClick = onStart,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 50.dp)
+                        onClick = onStart
                     )
                 }
             }

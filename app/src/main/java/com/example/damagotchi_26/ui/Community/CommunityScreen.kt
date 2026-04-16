@@ -84,10 +84,7 @@ fun CommunityScreen(
 
                 PrimaryAuthButton(
                     text = "Crear publicación",
-                    onClick = onCreatePostClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 35.dp)
+                    onClick = onCreatePostClick
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

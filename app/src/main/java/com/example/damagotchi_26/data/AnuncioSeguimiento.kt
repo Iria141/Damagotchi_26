@@ -1,10 +1,11 @@
 package com.example.damagotchi_26.data
 
-import android.R
+import androidx.compose.ui.graphics.Color
 
 data class AnuncioSeguimiento(
+    val id: String = "",
     val titulo: String = "",
-    val semanaGestacion:  Int = 1,
+    val semanaGestacion: Int = 1,
     val categoria: String = "",
     val contenido: String = "",
     val fuente: String = "",
@@ -12,3 +13,5 @@ data class AnuncioSeguimiento(
     val autorUid: String = "",
     val fechaCreacion: Long = System.currentTimeMillis()
 )
+
+
