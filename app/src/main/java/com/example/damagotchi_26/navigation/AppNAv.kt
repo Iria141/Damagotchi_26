@@ -30,6 +30,7 @@ import com.example.damagotchi_26.data.getUserProfile
 import com.example.damagotchi_26.repository.agregarAnuncioSeguimiento
 import com.example.damagotchi_26.ui.Community.CommunityScreen
 import com.example.damagotchi_26.ui.Community.CreatePostScreen
+import com.example.damagotchi_26.ui.Configuracion.ConfiguracionScreen
 import com.example.damagotchi_26.ui.Menu.Menu
 import com.example.damagotchi_26.ui.MiEmbarazo.CrearAnuncioAdmin
 import com.example.damagotchi_26.ui.MiEmbarazo.DetalleAnuncioScreen
@@ -79,7 +80,7 @@ fun AppNav(
                                         userProfile = profile
 
                                         val destino = if (!welcomeSeen) {
-                                            Route.Welcome.path
+                                            Route.Menu.path
                                         } else {
                                             Route.Menu.path
                                         }
@@ -222,7 +223,7 @@ fun AppNav(
                 nombre = userProfile?.nombre ?: "Usuario",
                 onPlayClick = {
                     navController.navigate(Route.Rooms.path)
-                    { launchSingleTop = true } //Evita abrir pantallas duplicadas
+                    { launchSingleTop = true }
                 },
                 onCommunityClick = {
                     navController.navigate(Route.Community.path)
@@ -231,8 +232,28 @@ fun AppNav(
                 onSeguimientoClick = {
                     navController.navigate(Route.SeguimientoScreem.path)
                     { launchSingleTop = true }
-
+                },
+                onConfiguracionClick = {
+                    navController.navigate(Route.Settings.path)
+                    { launchSingleTop = true }
                 }
+             /*   ,onAyudaClick = {
+                    // Pantalla de ayuda pendiente de implementar
+                },
+                onCerrarSesionClick = {
+                    FirebaseAuth.getInstance().signOut()
+                    scope.launch { onRememberMeChanged(false) }
+                    navController.navigate(Route.Login.path) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }*/
+            )
+        }
+
+        composable(Route.Settings.path) {
+            ConfiguracionScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -344,11 +365,6 @@ fun AppNav(
                 onBack = { navController.popBackStack() }
             )
         }
-
-        composable(Route.Configuracion.path) {
-
-        }
-
 
     }
 }

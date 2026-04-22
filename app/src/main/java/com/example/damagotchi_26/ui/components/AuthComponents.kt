@@ -53,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import com.example.damagotchi_26.data.Comment
 import com.example.damagotchi_26.repository.ComentarioRepository
@@ -62,6 +63,7 @@ import com.example.damagotchi_26.ui.Color.Color.CardGray
 import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
 import com.example.damagotchi_26.ui.Color.Color.PurpleBtn
 import com.example.damagotchi_26.data.Post
+import com.example.damagotchi_26.ui.Color.Color.CardWhiteRose
 import com.example.damagotchi_26.ui.Color.Color.YellowStar
 
 
@@ -160,13 +162,13 @@ fun AuthTextField(
                 .padding(horizontal = 24.dp),
 
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = CardGray,
-                unfocusedContainerColor = CardGray,
-                disabledContainerColor = CardGray,
+                focusedContainerColor = CardWhiteRose,
+                unfocusedContainerColor = CardWhiteRose,
+                disabledContainerColor = CardWhiteRose,
 
-                focusedBorderColor = BorderGray,
-                unfocusedBorderColor = BorderGray,
-                disabledBorderColor = BorderGray,
+                focusedBorderColor = CardWhiteRose,
+                unfocusedBorderColor = CardWhiteRose,
+                disabledBorderColor = CardWhiteRose,
 
                 focusedLabelColor = Color.Gray,
                 unfocusedLabelColor = Color.Gray,
@@ -321,7 +323,7 @@ fun MenuOptionCard(
 ) {
     Card(
         onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = CardGray),
+        colors = CardDefaults.cardColors(containerColor = CardWhiteRose),
         shape = RoundedCornerShape(22.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = modifier
@@ -887,6 +889,113 @@ private fun ComentarioCardInterna(comentario: Comment) {
                     color = if (yoDiLike) Color(0xFFE91E63) else Color.Gray
                 )
             }
+        }
+    }
+}
+// ─────────────────────────────────────────
+// Componentes reutilizables de configuración
+// ─────────────────────────────────────────
+
+@Composable
+fun ConfigCard(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            content = content
+        )
+    }
+}
+
+@Composable
+fun SeccionHeader(
+    titulo: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = titulo,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+        color = PurpleBlueText,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    )
+}
+
+@Composable
+fun FilaSwitch(
+    titulo: String,
+    descripcion: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = titulo,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 15.sp,
+                color = PurpleBlueText
+            )
+            Text(
+                text = descripcion,
+                fontSize = 12.sp,
+                color = Color.Gray
+            )
+        }
+        androidx.compose.material3.Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = androidx.compose.material3.SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = PurpleBtn
+            )
+        )
+    }
+}
+
+@Composable
+fun FilaClickable(
+    titulo: String,
+    descripcion: String,
+    tituloColor: Color = PurpleBlueText,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = titulo,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 15.sp,
+                color = tituloColor
+            )
+            Text(
+                text = descripcion,
+                fontSize = 12.sp,
+                color = Color.Gray
+            )
         }
     }
 }
