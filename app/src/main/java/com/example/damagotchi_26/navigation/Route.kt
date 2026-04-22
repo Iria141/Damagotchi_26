@@ -2,6 +2,7 @@ package com.example.damagotchi_26.navigation
 
 sealed class Route(val path: String) {
 
+    data object Configuration: Route("configuracion")
     data object CrearAnuncioAdmin : Route("crear_anuncio_admin")
     data object Menu : Route("menu")
     data object Community : Route("community")

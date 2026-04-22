@@ -1,4 +1,4 @@
-package com.example.damagotchi_26.utils
+package com.example.damagotchi_26.ui.components
 
 fun calcularDiaYSemana(fechaUltimaRegla: Long): Pair<Int, Int> {
     if (fechaUltimaRegla == 0L) return Pair(0, 0)

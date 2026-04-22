@@ -1,13 +1,18 @@
 package com.example.damagotchi_26
 
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.damagotchi_26.data.PetPrefs
 import com.example.damagotchi_26.navigation.AppNav
@@ -18,14 +23,43 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import com.example.damagotchi_26.data.UserPreferences
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : ComponentActivity() {
+
+    private val solicitarPermisoNotificacion = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Pedir permiso de notificaciones en Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                solicitarPermisoNotificacion.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
+        // Guardar token FCM en Firebase
+        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            if (uid != null) {
+                FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(uid)
+                    .update("fcmToken", token)
+            }
+        }
+
         setContent {
-            val petPrefs = remember { PetPrefs(applicationContext) } //prefs del juego
-            val userPrefs = remember { UserPreferences(applicationContext) } //prefs del login
+            val petPrefs = remember { PetPrefs(applicationContext) }
+            val userPrefs = remember { UserPreferences(applicationContext) }
             val rememberMe by userPrefs.rememberMeFlow.collectAsState(initial = false)
 
             val start = if (rememberMe) {
@@ -36,15 +70,11 @@ class MainActivity : ComponentActivity() {
 
             val scope = rememberCoroutineScope()
 
-
-            //PetViewModel
             val petFactory = remember { PetViewModelFactory(applicationContext) }
             val petViewModel: PetViewModel = viewModel(factory = petFactory)
 
-            // TransicionViewModel (con factory)
             val transFactory = remember { TransicionViewModelFactory(petPrefs) }
             val transicionViewModel: TransicionViewModel = viewModel(factory = transFactory)
-
 
             LaunchedEffect(Unit) {
                 petViewModel.iniciarTick()
@@ -61,7 +91,6 @@ class MainActivity : ComponentActivity() {
                         momentoDia = transicionViewModel.momentoDia,
                         onRememberMeChanged = { value ->
                             userPrefs.setRememberMe(value)
-
                         }
                     )
                 }
@@ -69,4 +98,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-

@@ -1,6 +1,5 @@
 package com.example.damagotchi_26.ui.MiEmbarazo
 
-import android.graphics.Color.red
 import android.widget.Toast
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +45,7 @@ import com.example.damagotchi_26.ui.components.PrimaryAuthButton
 import com.example.damagotchi_26.ui.components.SoftDisclaimer
 import com.example.damagotchi_26.ui.components.SweetSectionCard
 import com.example.damagotchi_26.ui.components.WeekHighlightCard
-import com.example.damagotchi_26.utils.calcularDiaYSemana
+import com.example.damagotchi_26.ui.components.calcularDiaYSemana
 
 @Composable
 fun SeguimientoScreem(
@@ -106,6 +105,7 @@ fun SeguimientoScreem(
             } else {
                 anuncios.clear()
                 anuncios.addAll(lista)
+                cargando = false
             }
         }
     }
@@ -160,7 +160,7 @@ fun SeguimientoScreem(
                         text = "🌸 $titulo 🌸",
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        fontSize = 30.sp,
+                        fontSize = 25.sp,
                         fontWeight = FontWeight.Bold,
                         color = PurpleBlueText
                     )

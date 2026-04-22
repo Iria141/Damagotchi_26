@@ -1,6 +1,5 @@
 package com.example.damagotchi_26.navigation
 
-import CommunityScreen
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.Composable
@@ -29,8 +28,8 @@ import com.example.damagotchi_26.data.AnuncioSeguimiento
 import com.example.damagotchi_26.data.UserPreferences
 import com.example.damagotchi_26.data.getUserProfile
 import com.example.damagotchi_26.repository.agregarAnuncioSeguimiento
+import com.example.damagotchi_26.ui.Community.CommunityScreen
 import com.example.damagotchi_26.ui.Community.CreatePostScreen
-import com.example.damagotchi_26.ui.Community.PostDetailScreen
 import com.example.damagotchi_26.ui.Menu.Menu
 import com.example.damagotchi_26.ui.MiEmbarazo.CrearAnuncioAdmin
 import com.example.damagotchi_26.ui.MiEmbarazo.DetalleAnuncioScreen
@@ -239,34 +238,22 @@ fun AppNav(
 
         composable(Route.Community.path) {
             CommunityScreen(
+                rol = userProfile?.rol ?: "jugador",
+                nombre = userProfile?.nombre ?: "",
                 onCreatePostClick = { navController.navigate(Route.CreatePost.path) },
-                onPostClick = { postId ->
-                    navController.navigate("detalle_post/$postId")
-                },
                 onBack = { navController.popBackStack() }
-
             )
         }
 
         composable(Route.CreatePost.path) {
             CreatePostScreen(
-                isAdmin = (userProfile?.rol ?: "").lowercase() == "admin",
-                onPublishClick = { titulo, contenido, tipo ->
-                    navController.popBackStack()
-                },
-                onBack = { navController.popBackStack() }
-
-            )
-        }
-
-        composable(Route.PostDetail.path) { backStackEntry ->
-            val postId = backStackEntry.arguments?.getString("postId") ?: ""
-
-            PostDetailScreen(
-                postId = postId,
+                rol = userProfile?.rol ?: "jugador",
+                nombre = userProfile?.nombre ?: "",
+                onPublishOk = { navController.popBackStack() },
                 onBack = { navController.popBackStack() }
             )
         }
+
 
         composable(Route.SeguimientoScreem.path) {
             SeguimientoScreem(
@@ -358,6 +345,9 @@ fun AppNav(
             )
         }
 
+        composable(Route.Configuracion.path) {
+
+        }
 
 
     }

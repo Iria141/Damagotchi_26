@@ -1,22 +1,25 @@
 package com.example.damagotchi_26.ui.Community
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.damagotchi_26.repository.PublicacionesRepository
 import com.example.damagotchi_26.ui.Color.Color.CardGray
 import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
 import com.example.damagotchi_26.ui.Color.Color.PurpleBtn
@@ -28,21 +31,30 @@ import com.example.damagotchi_26.ui.components.PrimaryAuthButton
 
 @Composable
 fun CreatePostScreen(
-    isAdmin: Boolean = false,
-    onPublishClick: (String, String, String) -> Unit = { _, _, _ -> },
+    rol: String = "jugador",
+    nombre: String = "",
+    onPublishOk: () -> Unit = {},
     onBack: () -> Unit = {}
 ) {
-    var title by remember { mutableStateOf("") }
-    var content by remember { mutableStateOf("") }
-    var selectedType by remember { mutableStateOf("pregunta") }
+    val context = LocalContext.current
+    val postRepository = remember { PublicacionesRepository() }
 
+    var titulo by remember { mutableStateOf("") }
+    var contenido by remember { mutableStateOf("") }
+    var selectedType by remember { mutableStateOf("pregunta") }
+    var tituloError by remember { mutableStateOf(false) }
+    var contenidoError by remember { mutableStateOf(false) }
+    var publicando by remember { mutableStateOf(false) }
+
+    val isAdmin = rol.lowercase() == "admin"
     val availableTypes = if (isAdmin) {
         listOf("pregunta", "opinion", "anuncio")
     } else {
         listOf("pregunta", "opinion")
     }
-    val maxContenido = 250;
-    val maxTitulo = 50;
+
+    val maxTitulo = 50
+    val maxContenido = 250
 
     Scaffold(
         bottomBar = {
@@ -76,7 +88,7 @@ fun CreatePostScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Comparte una duda, una opinión o un anuncio con la comunidad",
+                    text = "Comparte una duda, una opinión o una experiancia  con la comunidad",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontSize = 15.sp,
@@ -85,29 +97,46 @@ fun CreatePostScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                AuthCard(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    AuthTextField(
-                        value = title,
-                        onValueChange = {
-                            if (it.length <= maxTitulo) {
-                                title = it
-                            }
-                        },
-                        label = "Título"
-                    )
+                AuthCard(modifier = Modifier.fillMaxWidth()) {
 
                     AuthTextField(
-                        value = content,
+                        value = titulo,
                         onValueChange = {
-                            if (it.length <= maxContenido) {
-                                content = it
+                            if (it.length <= maxTitulo) {
+                                titulo = it
+                                tituloError = false
                             }
                         },
-                        label = "Contenido",
+                        label = "Título (${titulo.length}/$maxTitulo)"
+                    )
+                    if (tituloError) {
+                        Text(
+                            text = "El título no puede estar vacío",
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
+                        )
+                    }
+
+                    AuthTextField(
+                        value = contenido,
+                        onValueChange = {
+                            if (it.length <= maxContenido) {
+                                contenido = it
+                                contenidoError = false
+                            }
+                        },
+                        label = "Contenido (${contenido.length}/$maxContenido)",
                         singleLine = false
                     )
+                    if (contenidoError) {
+                        Text(
+                            text = "El contenido no puede estar vacío",
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -138,9 +167,29 @@ fun CreatePostScreen(
                     Spacer(modifier = Modifier.height(14.dp))
 
                     PrimaryAuthButton(
-                        text = "Publicar",
+                        text = if (publicando) "Publicando..." else "Publicar",
                         onClick = {
-                            onPublishClick(title, content, selectedType)
+                            tituloError = titulo.isBlank()
+                            contenidoError = contenido.isBlank()
+
+                            if (!tituloError && !contenidoError && !publicando) {
+                                publicando = true
+                                postRepository.crearPost(
+                                    titulo = titulo.trim(),
+                                    contenido = contenido.trim(),
+                                    tipo = selectedType,
+                                    authorName = nombre,
+                                    authorRole = rol,
+                                    onOk = {
+                                        publicando = false
+                                        onPublishOk()
+                                    },
+                                    onError = { error ->
+                                        publicando = false
+                                        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                    }
+                                )
+                            }
                         }
                     )
                 }
@@ -183,6 +232,6 @@ fun TypeOptionChip(
 @Composable
 fun CreatePostScreenPreview() {
     MaterialTheme {
-        CreatePostScreen(isAdmin = true)
+        CreatePostScreen(rol = "admin", nombre = "Admin")
     }
 }

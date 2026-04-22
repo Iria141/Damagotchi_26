@@ -1,15 +1,28 @@
 package com.example.damagotchi_26.ui.components
 
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.StarBorder
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -19,10 +32,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +48,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.widget.Toast
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.example.damagotchi_26.data.Comment
+import com.example.damagotchi_26.repository.ComentarioRepository
+import com.example.damagotchi_26.repository.LikeRepository
 import com.example.damagotchi_26.ui.Color.Color.BorderGray
 import com.example.damagotchi_26.ui.Color.Color.CardGray
 import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
@@ -50,7 +72,6 @@ fun AuthBackground(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = 24.dp)
             .background(com.example.damagotchi_26.ui.Color.Color.PinkBg),
         content = content
     )
@@ -486,5 +507,386 @@ fun BackTextButton(
     }
 }
 
+fun formatearFecha(timestamp: Long): String {
+    if (timestamp == 0L) return ""
+    val ahora = System.currentTimeMillis()
+    val diferencia = ahora - timestamp
+    val minutos = diferencia / 60_000
+    val horas = diferencia / 3_600_000
+    val dias = diferencia / 86_400_000
+
+    val calAhora = Calendar.getInstance()
+    val calFecha = Calendar.getInstance().apply { timeInMillis = timestamp }
+    val esAyer = calAhora.get(Calendar.DAY_OF_YEAR) - calFecha.get(Calendar.DAY_OF_YEAR) == 1
+            && calAhora.get(Calendar.YEAR) == calFecha.get(Calendar.YEAR)
+    val mismoAnio = calAhora.get(Calendar.YEAR) == calFecha.get(Calendar.YEAR)
+
+    val hora = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestamp))
+    val fechaCorta = SimpleDateFormat("d MMM", Locale("es")).format(Date(timestamp))
+    val fechaLarga = SimpleDateFormat("d MMM yyyy", Locale("es")).format(Date(timestamp))
+
+    return when {
+        minutos < 1 -> "ahora"
+        minutos < 60 -> "hace $minutos min"
+        horas < 24 -> "hace $horas ${if (horas == 1L) "hora" else "horas"}"
+        esAyer -> "ayer · $hora"
+        mismoAnio -> "$fechaCorta · $hora"
+        else -> "$fechaLarga · $hora"
+    }
+}
 
 
+@Composable
+fun PostCardExpandible(
+    post: Post,
+    rol: String = "jugador",
+    nombre: String = "",
+    index: Int = 0,
+    expandidoExterno: Boolean = false,
+    onLikeChanged: (postId: String, diLike: Boolean) -> Unit = { _, _ -> }
+) {
+    val context = LocalContext.current
+    val comentarioRepository = remember { ComentarioRepository() }
+    val likeRepository = remember { LikeRepository() }
+    val comentarios = remember { mutableStateListOf<Comment>() }
+
+    var expandido by remember(expandidoExterno) { mutableStateOf(expandidoExterno) }
+    var comentariosCargados by remember { mutableStateOf(false) }
+    var nuevoComentario by remember { mutableStateOf("") }
+    var enviando by remember { mutableStateOf(false) }
+
+    var likesPost by remember { mutableStateOf(0) }
+    var yoDiLikePost by remember { mutableStateOf(false) }
+
+    val isAdmin = post.authorRole.lowercase() == "admin"
+
+    val icon = when (post.type.lowercase()) {
+        "anuncio" -> "📢"
+        "pregunta" -> "❓"
+        "opinion" -> "💬"
+        else -> "📝"
+    }
+
+    // Carga likes del post
+    LaunchedEffect(post.id) {
+        likeRepository.obtenerLikesPost(
+            postId = post.id,
+            onResultado = { total, yoDiLike ->
+                likesPost = total
+                yoDiLikePost = yoDiLike
+            },
+            onError = {}
+        )
+    }
+
+    // Carga comentarios la primera vez que se expande
+    LaunchedEffect(expandido) {
+        if (expandido && !comentariosCargados) {
+            comentarioRepository.obtenerComentarios(
+                postId = post.id,
+                onResultado = { lista ->
+                    comentarios.clear()
+                    comentarios.addAll(lista)
+                    comentariosCargados = true
+                },
+                onError = { error ->
+                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+    }
+
+    // Colores alternos atractivos, admin siempre blanco
+    val colorCard = when {
+        isAdmin -> Color.White
+        index % 2 == 0 -> Color(0xFFF5EFE6) // beige cálido
+        else -> Color(0xFFEEF0F5)            // gris azulado suave
+    }
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = colorCard),
+        shape = RoundedCornerShape(22.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Cabecera
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = "$icon ${post.title}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = PurpleBlueText,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f)
+                )
+                if (post.isPinned) {
+                    Text(
+                        text = "📌",
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Por: ${post.authorName}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+                Text(
+                    text = formatearFecha(post.createdAt),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                PostTypeChip(text = post.type, isAdmin = isAdmin)
+                if (isAdmin) PostTypeChip(text = "admin", isAdmin = true)
+            }
+
+            Text(
+                text = post.content,
+                style = MaterialTheme.typography.bodyMedium,
+                color = PurpleBlueText
+            )
+
+            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+
+            // Fila de acciones: like + respuestas
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Botón like
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    IconButton(
+                        onClick = {
+                            likeRepository.toggleLikePost(
+                                postId = post.id,
+                                yaDioLike = yoDiLikePost,
+                                onOk = { nuevoTotal, nuevoLike ->
+                                    likesPost = nuevoTotal
+                                    yoDiLikePost = nuevoLike
+                                    onLikeChanged(post.id, nuevoLike)
+                                },
+                                onError = { error ->
+                                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (yoDiLikePost) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Like",
+                            tint = if (yoDiLikePost) Color(0xFFE91E63) else Color.Gray
+                        )
+                    }
+                    Text(
+                        text = "$likesPost",
+                        fontSize = 13.sp,
+                        color = if (yoDiLikePost) Color(0xFFE91E63) else Color.Gray,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                // Botón respuestas con icono
+                Row(
+                    modifier = Modifier.clickable { expandido = !expandido },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "💬 ${if (comentariosCargados) comentarios.size else "..."}",
+                        color = PurpleBtn,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Icon(
+                        imageVector = if (expandido) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                        contentDescription = if (expandido) "Ocultar" else "Ver respuestas",
+                        tint = PurpleBtn
+                    )
+                }
+            }
+
+            // Sección expandible de comentarios
+            AnimatedVisibility(
+                visible = expandido,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (!comentariosCargados) {
+                        Text(text = "Cargando respuestas...", color = Color.Gray, fontSize = 13.sp)
+                    } else if (comentarios.isEmpty()) {
+                        Text(text = "Aún no hay respuestas. ¡Sé el primero!", color = Color.Gray, fontSize = 13.sp)
+                    } else {
+                        comentarios.forEach { comentario ->
+                            ComentarioCardInterna(comentario = comentario)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Bottom,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = nuevoComentario,
+                            onValueChange = { if (it.length <= 300) nuevoComentario = it },
+                            label = { Text("Responder... (${nuevoComentario.length}/300)") },
+                            modifier = Modifier.weight(1f),
+                            minLines = 1,
+                            maxLines = 4,
+                            singleLine = false
+                        )
+
+                        IconButton(
+                            onClick = {
+                                if (nuevoComentario.isBlank() || enviando) return@IconButton
+                                enviando = true
+                                comentarioRepository.agregarComentario(
+                                    postId = post.id,
+                                    texto = nuevoComentario.trim(),
+                                    authorName = nombre,
+                                    authorRole = rol,
+                                    onOk = {
+                                        comentarios.add(
+                                            Comment(
+                                                postId = post.id,
+                                                authorName = nombre,
+                                                authorRole = rol,
+                                                content = nuevoComentario.trim(),
+                                                createdAt = System.currentTimeMillis()
+                                            )
+                                        )
+                                        nuevoComentario = ""
+                                        enviando = false
+                                    },
+                                    onError = { error ->
+                                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                                        enviando = false
+                                    }
+                                )
+                            },
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Send,
+                                contentDescription = "Enviar",
+                                tint = if (nuevoComentario.isBlank()) Color.Gray else PurpleBtn
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ComentarioCardInterna(comentario: Comment) {
+    val isAdmin = comentario.authorRole.lowercase() == "admin"
+
+    var likesComentario by remember { mutableStateOf(0) }
+    var yoDiLike by remember { mutableStateOf(false) }
+
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = if (isAdmin) PurpleBtn.copy(alpha = 0.08f) else Color.White.copy(alpha = 0.6f),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            // Fila 1: nombre + fecha
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (isAdmin) "👩‍⚕️ ${comentario.authorName}" else comentario.authorName,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        color = if (isAdmin) PurpleBtn else PurpleBlueText
+                    )
+                    if (isAdmin) {
+                        Text(
+                            text = "ADMIN",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = PurpleBtn
+                        )
+                    }
+                }
+                Text(
+                    text = formatearFecha(comentario.createdAt),
+                    fontSize = 11.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Fila 2: texto de la respuesta
+            Text(
+                text = comentario.content,
+                style = MaterialTheme.typography.bodySmall,
+                color = PurpleBlueText
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Fila 3: like
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                IconButton(
+                    onClick = {
+                        if (yoDiLike) {
+                            likesComentario--
+                            yoDiLike = false
+                        } else {
+                            likesComentario++
+                            yoDiLike = true
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (yoDiLike) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Like comentario",
+                        tint = if (yoDiLike) Color(0xFFE91E63) else Color.Gray
+                    )
+                }
+                Text(
+                    text = "$likesComentario",
+                    fontSize = 12.sp,
+                    color = if (yoDiLike) Color(0xFFE91E63) else Color.Gray
+                )
+            }
+        }
+    }
+}

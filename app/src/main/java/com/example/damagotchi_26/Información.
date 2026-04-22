@@ -7,3 +7,17 @@ Eventos en la semana
 noticificacion push,  rol de admin para usar en un tablo de anuncios usando este push o por email
 
 Permisos (reglas) de firebase, no desarrollar pero punto importante para la defensa del proyecto
+
+
+“Se ha optado por mostrar las fuentes informativas dentro de la aplicación sin redirigir al usuario fuera de la misma, con el objetivo de mantener una experiencia de uso fluida y controlada.”
+"Recuerda que en mi app uso Filter Chips horizontales scrollables de Material3 para filtrar por categoría y favoritos en la pantalla de Seguimiento""
+
+Uso de Blaze, para crear las notificaciones push
+Elegimos JavaScript porqeu es el que mas documencaion aporta par realizar el proyecto con FireBAse.
+"La app Damagotchi usa Firebase Cloud Messaging (FCM) para notificaciones push. El servicio
+MensajeFirebaseService recibe el token FCM y las notificaciones entrantes. El permiso
+POST_NOTIFICATIONS es necesario solo en Android 13+ (API 33+) y se ignora automáticamente
+en versiones anteriores. El minSdk es 24 (Android 7), por lo que la app es compatible
+desde Android 7 en adelante. Las notificaciones se disparan desde Cloud Functions en F
+irebase cuando se crea una nueva publicación (onNuevaPublicacion) o un comentario
+(onNuevoComentario) en la colección community_posts."
