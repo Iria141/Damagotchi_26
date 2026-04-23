@@ -1,6 +1,12 @@
 package com.example.damagotchi_26.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
@@ -16,11 +22,67 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.damagotchi_26.domain.Pet
 import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import com.example.damagotchi_26.R
 
 
 private enum class Medidor { ENERGIA, HAMBRE, SED, HIGIENE, ACTIVIDAD, SUEÑO }
+
+// Determina el trimestre según la semana
+fun trimestresDePersonaje(semana: Int): Int = when (semana) {
+    in 1..12 -> 1
+    in 13..20 -> 2
+    in 21..30 -> 3
+    else -> 4  // 31-40
+}
+
+// Determina el estado emocional según los medidores
+fun estadoEmocional(pet: Pet): String {
+    val criticos = listOf(pet.energia, pet.hambre, pet.sed, pet.limpieza, pet.actividad, pet.descanso)
+        .count { it < 30 }
+    val bajos = listOf(pet.energia, pet.hambre, pet.sed, pet.limpieza, pet.actividad, pet.descanso)
+        .count { it < 50 }
+    return when {
+        criticos >= 2 -> "triste"
+        bajos >= 3 -> "triste"
+        listOf(pet.energia, pet.hambre, pet.sed, pet.limpieza, pet.actividad, pet.descanso)
+            .all { it >= 70 } -> "superfeliz"
+        else -> "feliz"
+    }
+}
+
+// Selecciona el drawable correcto
+fun drawablePersonaje(pet: Pet, mirandoDerecha: Boolean): Int {
+    val trimestre = trimestresDePersonaje(pet.semanaEmbarazo)
+    val estado = estadoEmocional(pet)
+    val dir = if (mirandoDerecha) "dcha" else "izq"
+
+    // T4 solo tiene estado_inicial (sin variantes de dirección/estado)
+    if (trimestre == 4) return R.drawable.estado_inicial
+
+    return when ("${estado}_${dir}_t${trimestre}") {
+        "feliz_dcha_t1" -> R.drawable.feliz_dcha_t1
+        "feliz_dcha_t2" -> R.drawable.feliz_dcha_t2
+        "feliz_dcha_t3" -> R.drawable.feliz_dcha_t3
+        "feliz_izq_t1"  -> R.drawable.feliz_izq_t1
+        "feliz_izq_t2"  -> R.drawable.feliz_izq_t2
+        "feliz_izq_t3"  -> R.drawable.feliz_izq_t3
+        "superfeliz_dcha_t1" -> R.drawable.superfeliz_dcha_t1
+        "superfeliz_dcha_t2" -> R.drawable.superfeliz_dcha_t2
+        "superfeliz_dcha_t3" -> R.drawable.superfeliz_dcha_t3
+        "superfeliz_izq_t1"  -> R.drawable.superfeliz_izq_t1
+        "superfeliz_izq_t2"  -> R.drawable.superfeliz_izq_t2
+        "superfeliz_izq_t3"  -> R.drawable.superfeliz_izq_t3
+        "triste_dcha_t1" -> R.drawable.triste_dcha_t1
+        "triste_dcha_t2" -> R.drawable.triste_dcha_t2
+        "triste_dcha_t3" -> R.drawable.triste_dcha_t3
+        "triste_izq_t1"  -> R.drawable.triste_izq_t1
+        "triste_izq_t2"  -> R.drawable.triste_izq_t2
+        "triste_izq_t3"  -> R.drawable.triste_izq_t3
+        else -> R.drawable.estado_inicial
+    }
+}
 
 @Composable
 fun IconsPanel(
@@ -29,19 +91,34 @@ fun IconsPanel(
 ) {
     var medidorActivo by remember { mutableStateOf<Medidor?>(null) }
 
-    Box(
-        modifier= Modifier
-            .fillMaxWidth()
+    // Animación de movimiento lateral — va y vuelve en 4 segundos
+    val infiniteTransition = rememberInfiniteTransition(label = "personaje")
+    val offsetX by infiniteTransition.animateFloat(
+        initialValue = -60f,
+        targetValue = 60f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 3000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "movimiento"
+    )
 
+    // Determina si mira a la derecha según la dirección del movimiento
+    val mirandoDerecha = offsetX > 0f
+    val drawable = drawablePersonaje(pet, mirandoDerecha)
+
+    Box(
+        modifier = Modifier.fillMaxWidth()
     ) {
         Image(
-            painter = painterResource(R.drawable.estado_inicial),
+            painter = painterResource(drawable),
             contentDescription = "Personaje",
             modifier = Modifier
                 .width(400.dp)
                 .height(500.dp)
                 .align(Alignment.Center)
                 .padding(start = 80.dp)
+                .graphicsLayer { translationX = offsetX }
         )
 
         Column(

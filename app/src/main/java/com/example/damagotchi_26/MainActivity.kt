@@ -63,12 +63,10 @@ class MainActivity : ComponentActivity() {
             val rememberMe by userPrefs.rememberMeFlow.collectAsState(initial = false)
 
             val start = if (rememberMe) {
-                com.example.damagotchi_26.navigation.Route.Rooms.path
+                com.example.damagotchi_26.navigation.Route.Menu.path
             } else {
                 com.example.damagotchi_26.navigation.Route.Login.path
             }
-
-            val scope = rememberCoroutineScope()
 
             val petFactory = remember { PetViewModelFactory(applicationContext) }
             val petViewModel: PetViewModel = viewModel(factory = petFactory)
