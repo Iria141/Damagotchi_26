@@ -51,7 +51,7 @@ fun RoomsPagerScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
 
-    
+
 
     Scaffold(
         snackbarHost = {
@@ -118,18 +118,26 @@ fun RoomsPagerScreen(
 
                     2 -> BedRoom(
                         pet = pet,
-                        dormir = { petViewModel.dormir() }
+                        dormir = { petViewModel.dormir() },
+                        dormirProgresivo = {petViewModel.dormirProgresivo()},
+                        siesta = { petViewModel.siesta() },
+                        meditar = { petViewModel.meditar() }
                     )
 
-                    3 -> BathRoom (
+                    3 -> BathRoom(
                         pet = pet,
-                        limpieza = { petViewModel.higiene()}
+                        limpieza = { petViewModel.higiene() },
+                        irAlBano = { petViewModel.irAlBano() },
+                        ducharse = { petViewModel.ducharse() },
+                        lavarDientes = { petViewModel.lavarDientes() },
+                        cuidarPiel = { petViewModel.cuidarPiel() }
                     )
 
                     4 -> Park(
                         pet = pet,
-                        caminar = {petViewModel.caminar()},
-                        yoga = {petViewModel.yoga()}
+                        caminar = { petViewModel.caminar() },
+                        yoga = { petViewModel.yoga() },
+                        estirar = { petViewModel.estirar() }
                     )
 
                     5 -> Clinic(
@@ -168,4 +176,3 @@ private fun RoomDots(total: Int, current: Int, modifier: Modifier = Modifier) {
         }
     }
 }
-

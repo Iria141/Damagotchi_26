@@ -28,8 +28,8 @@ import com.example.damagotchi_26.viewmodel.TransicionViewModel
 fun Park(
     pet: Pet,
     caminar: () -> Unit,
-    yoga: () -> Unit//Estos son los callbacks
-
+    yoga: () -> Unit,
+    estirar: () -> Unit
 ) {
 
     val vm: TransicionViewModel = viewModel ()
@@ -104,9 +104,13 @@ fun Park(
                     text = "Yoga",
                     onClick = yoga
                 )
+
+                ActionButton(
+                    image = R.drawable.pilates,
+                    text = "Estirar",
+                    onClick = estirar
+                )
             }
         }
     }
 }
-
-
