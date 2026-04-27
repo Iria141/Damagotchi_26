@@ -112,14 +112,15 @@ fun RoomsPagerScreen(
                     1 -> Kitchen(
                         pet = pet,
                         comer = { petViewModel.alimentar() },
-                        beber = { petViewModel.hidratar() }
+                        beber = { petViewModel.hidratar() },
+                        prepararComida = { petViewModel.prepararComida() }
                     )
 
 
                     2 -> BedRoom(
                         pet = pet,
                         dormir = { petViewModel.dormir() },
-                        dormirProgresivo = {petViewModel.dormirProgresivo()},
+                        dormirProgresivo = { petViewModel.dormirProgresivo() },
                         siesta = { petViewModel.siesta() },
                         meditar = { petViewModel.meditar() }
                     )

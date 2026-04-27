@@ -72,6 +72,14 @@ class PetViewModel(
         )
     }
 
+    fun prepararComida() = actualizar { actual ->
+        actual.copy(
+            energia = limitar(actual.energia + 10),
+            actividad = limitar(actual.actividad + 8),
+            hambre = limitar(actual.hambre - 2) // cocinar da apetito
+        )
+    }
+
     fun verTV() = actualizar { actual ->
         actual.copy(
             sed = limitar(actual.sed - 1),
