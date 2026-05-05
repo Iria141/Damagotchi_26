@@ -185,13 +185,19 @@ class PetViewModel(
         )
     }
 
-    fun yoga() = actualizar { actual ->
+    fun tocarPiano() = actualizar { actual ->
         actual.copy(
-            energia = limitar(actual.energia + 8),
-            hambre = limitar(actual.hambre - 5),
-            limpieza = limitar(actual.limpieza + 8),
-            sed = limitar(actual.sed - 2),
-            actividad = limitar(actual.actividad + 30)
+            actividad = limitar(actual.actividad + 12),
+            descanso = limitar(actual.descanso + 8),
+            energia = limitar(actual.energia + 5)
+        )
+    }
+
+    fun pintar() = actualizar { actual ->
+        actual.copy(
+            actividad = limitar(actual.actividad + 10),
+            descanso = limitar(actual.descanso + 10),
+            energia = limitar(actual.energia + 5)
         )
     }
 

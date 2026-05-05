@@ -134,13 +134,6 @@ fun BedRoom(
                         }
                     }
                 )
-                ActionButton(
-                    image = R.drawable.pilates,
-                    text = "Meditar",
-                    onClick = {
-                        if (tipoDescanso == TipoDescanso.NINGUNO) meditar()
-                    }
-                )
             }
 
             // Overlay SIESTA

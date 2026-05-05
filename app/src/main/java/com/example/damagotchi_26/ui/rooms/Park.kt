@@ -1,12 +1,11 @@
 package com.example.damagotchi_26.ui.rooms
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -20,28 +19,29 @@ import com.example.damagotchi_26.R
 import com.example.damagotchi_26.domain.Pet
 import com.example.damagotchi_26.ui.components.IconsPanel
 import com.example.damagotchi_26.ui.components.NightOverlay
+import com.example.damagotchi_26.ui.components.OverlyRooms.CaminarOverlay
 import com.example.damagotchi_26.ui.theme.ActionButton
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
+
+private enum class AccionParque { NINGUNA, CAMINAR, YOGA, ESTIRAR }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Park(
     pet: Pet,
     caminar: () -> Unit,
-    yoga: () -> Unit,
     estirar: () -> Unit
 ) {
-
-    val vm: TransicionViewModel = viewModel ()
+    val vm: TransicionViewModel = viewModel()
     val momento by vm.momentoDia.collectAsState()
+    var accionActiva by remember { mutableStateOf(AccionParque.NINGUNA) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
@@ -50,10 +50,8 @@ fun Park(
                             fontWeight = FontWeight.SemiBold,
                             lineHeight = 30.sp
                         )
-
                         Text(
-                            text = "Actividad: ${pet.actividad}%    " +
-                                    "|   Energía: ${pet.energia}%",
+                            text = "Actividad: ${pet.actividad}%  |  Energía: ${pet.energia}%",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -62,13 +60,11 @@ fun Park(
             )
         }
     ) { padding ->
-
         Box(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
         ) {
-            // Fondo
             Image(
                 painter = painterResource(id = R.drawable.parque),
                 contentDescription = null,
@@ -76,14 +72,9 @@ fun Park(
                 modifier = Modifier.fillMaxSize()
             )
 
-            NightOverlay(momento = momento, maxDarkness = 0.55f) //Fondo oscurecido cuando "anochece"
-
-
-            //Iconos izquierda
+            NightOverlay(momento = momento, maxDarkness = 0.55f)
             IconsPanel(pet = pet)
-            Spacer(Modifier.width(12.dp))
 
-            // 🔽 Acciones abajo
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -96,19 +87,39 @@ fun Park(
                 ActionButton(
                     image = R.drawable.caminar,
                     text = "Caminar",
-                    onClick = caminar
-                )
-
-                ActionButton(
-                    image = R.drawable.pilates,
-                    text = "Yoga",
-                    onClick = yoga
+                    onClick = {
+                        if (accionActiva == AccionParque.NINGUNA)
+                            accionActiva = AccionParque.CAMINAR
+                    }
                 )
 
                 ActionButton(
                     image = R.drawable.pilates,
                     text = "Estirar",
-                    onClick = estirar
+                    onClick = {
+                        if (accionActiva == AccionParque.NINGUNA)
+                            accionActiva = AccionParque.ESTIRAR
+                    }
+                )
+            }
+
+            // Overlay Caminar
+            if (accionActiva == AccionParque.CAMINAR) {
+                CaminarOverlay(
+                    onCompletado = {
+                        caminar()
+                        accionActiva = AccionParque.NINGUNA
+                    }
+                )
+            }
+
+            // Overlay Estirar
+            if (accionActiva == AccionParque.ESTIRAR) {
+                EstirarOverlay(
+                    onCompletado = {
+                        estirar()
+                        accionActiva = AccionParque.NINGUNA
+                    }
                 )
             }
         }
