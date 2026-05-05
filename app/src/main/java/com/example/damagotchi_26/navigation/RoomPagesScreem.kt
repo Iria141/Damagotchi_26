@@ -15,6 +15,8 @@ import com.example.damagotchi_26.ui.rooms.Clinic
 import com.example.damagotchi_26.ui.rooms.Kitchen
 import com.example.damagotchi_26.ui.rooms.LivingRoom
 import com.example.damagotchi_26.ui.rooms.Park
+import com.example.damagotchi_26.ui.rooms.PerdidaDefinitivaScreen
+import com.example.damagotchi_26.ui.rooms.PerdidaEmbarazoScreen
 import com.example.damagotchi_26.viewmodel.PetViewModel
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +31,8 @@ fun RoomsPagerScreen(
     rol: String
 ) {
     val petEstado by petViewModel.pet.collectAsState(initial = null)
+    val perdidaEmbarazo by transicionViewModel.perdidaEmbarazo.collectAsState()
+    val perdidaDefinitiva by transicionViewModel.perdidaDefinitiva.collectAsState()
 
     if (petEstado == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -46,6 +50,19 @@ fun RoomsPagerScreen(
         transicionViewModel.comprobarAvisoTrimestre(
             pet.semanaEmbarazo,
             rol = rol)
+    }
+
+    // Comprueba pérdida cada vez que cambia el día
+    val diaActual by transicionViewModel.diaActual.collectAsState()
+    LaunchedEffect(diaActual) {
+        transicionViewModel.comprobarPerdida(
+            energia = pet.energia,
+            hambre = pet.hambre,
+            sed = pet.sed,
+            limpieza = pet.limpieza,
+            actividad = pet.actividad,
+            descanso = pet.descanso
+        )
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -105,8 +122,7 @@ fun RoomsPagerScreen(
                     0 -> LivingRoom(
                         pet = pet,
                         tocarPiano = { petViewModel.tocarPiano() },
-                        pintar = { petViewModel.pintar()
-                        }
+                        pintar = { petViewModel.pintar() }
                     )
 
                     1 -> Kitchen(
@@ -149,6 +165,28 @@ fun RoomsPagerScreen(
                 }
             }
         }
+    }
+
+    // Pantalla de pérdida — primera vez
+    if (perdidaEmbarazo) {
+        PerdidaEmbarazoScreen(
+            onReintentar = {
+                petViewModel.resetearMedidores()
+                transicionViewModel.resetearPerdida()
+            },
+            onVolverMenu = {
+                transicionViewModel.resetearPerdida()
+            }
+        )
+    }
+
+    // Pantalla de pérdida definitiva — segunda vez
+    if (perdidaDefinitiva) {
+        PerdidaDefinitivaScreen(
+            onVerEvaluacion = {
+                // Navegar a evaluación final — se implementará próximamente
+            }
+        )
     }
 }
 

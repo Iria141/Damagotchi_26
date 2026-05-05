@@ -80,25 +80,6 @@ class PetViewModel(
         )
     }
 
-    fun verTV() = actualizar { actual ->
-        actual.copy(
-            sed = limitar(actual.sed - 1),
-            hambre = limitar(actual.hambre - 2),
-            descanso = limitar(actual.descanso + 5),
-            actividad = limitar(actual.actividad + 2),
-            energia = limitar(actual.energia + 5)
-        )
-    }
-
-    fun leer() = actualizar { actual ->
-        actual.copy(
-            sed = limitar(actual.sed - 1),
-            hambre = limitar(actual.hambre - 2),
-            descanso = limitar(actual.descanso + 5),
-            actividad = limitar(actual.actividad + 5),
-            energia = limitar(actual.energia + 5)
-        )
-    }
 
     fun dormir() = actualizar { actual ->
         actual.copy(
@@ -201,6 +182,16 @@ class PetViewModel(
         )
     }
 
+    fun resetearMedidores() = actualizar { actual ->
+        actual.copy(
+            energia = 50,
+            hambre = 50,
+            sed = 50,
+            limpieza = 50,
+            actividad = 50,
+            descanso = 50
+        )
+    }
 
     fun avanzarSemana() = actualizar { actual ->
         actual.copy(

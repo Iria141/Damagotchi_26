@@ -892,9 +892,6 @@ private fun ComentarioCardInterna(comentario: Comment) {
         }
     }
 }
-// ─────────────────────────────────────────
-// Componentes reutilizables de configuración
-// ─────────────────────────────────────────
 
 @Composable
 fun ConfigCard(

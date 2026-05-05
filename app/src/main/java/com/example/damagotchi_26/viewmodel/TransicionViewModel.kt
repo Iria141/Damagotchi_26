@@ -32,6 +32,16 @@ class TransicionViewModel (
     private val _avisos = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val avisos = _avisos.asSharedFlow()
 
+    // Sistema de pérdida
+    private val _perdidaEmbarazo = MutableStateFlow(false)
+    val perdidaEmbarazo: StateFlow<Boolean> = _perdidaEmbarazo
+
+    private val _perdidaDefinitiva = MutableStateFlow(false)
+    val perdidaDefinitiva: StateFlow<Boolean> = _perdidaDefinitiva
+
+    private var diasCriticosConsecutivos = 0
+    private var vecesPerdida = 0
+
     val semanaActual: StateFlow<Int> =
         diaActual.map { dia ->
             ((dia - 1) / 7) + 1
@@ -69,6 +79,40 @@ class TransicionViewModel (
 
     private fun avanzarDia() {
         _diaActual.value += 1
+    }
+
+    fun comprobarPerdida(
+        energia: Int,
+        hambre: Int,
+        sed: Int,
+        limpieza: Int,
+        actividad: Int,
+        descanso: Int
+    ) {
+        val medidoresCriticos = listOf(energia, hambre, sed, limpieza, actividad, descanso)
+            .count { it <= 20 }
+
+        if (medidoresCriticos >= 3) {
+            diasCriticosConsecutivos++
+            if (diasCriticosConsecutivos >= 2) {
+                vecesPerdida++
+                diasCriticosConsecutivos = 0
+                if (vecesPerdida >= 2) {
+                    // Segunda pérdida → definitiva
+                    _perdidaDefinitiva.value = true
+                } else {
+                    // Primera pérdida → aviso
+                    _perdidaEmbarazo.value = true
+                }
+            }
+        } else {
+            diasCriticosConsecutivos = 0
+        }
+    }
+
+    fun resetearPerdida() {
+        _perdidaEmbarazo.value = false
+        diasCriticosConsecutivos = 0
     }
 
     private fun tiempoLuz(): Long =
@@ -147,6 +191,3 @@ object TimeConfig { //MODO PRESENTACION -- ACTIVAR DEBUG
     const val CICLO_LUZ_DEBUG = 5 * SEGUNDO        // 5 segundos
     const val CICLO_LUZ_REAL = (1.24 * HORA).toLong()
 }
-
-
-
