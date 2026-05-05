@@ -24,6 +24,15 @@ class PetPrefs(private val context: Context) {
     private val KEY_SEMANA = intPreferencesKey("semana_embarazo")
     private val KEY_DIA = intPreferencesKey("dia_embarazo")
 
+    // Keys para evaluación
+    private val KEY_SUMA_ENERGIA = intPreferencesKey("suma_energia")
+    private val KEY_SUMA_HAMBRE = intPreferencesKey("suma_hambre")
+    private val KEY_SUMA_SED = intPreferencesKey("suma_sed")
+    private val KEY_SUMA_LIMPIEZA = intPreferencesKey("suma_limpieza")
+    private val KEY_SUMA_ACTIVIDAD = intPreferencesKey("suma_actividad")
+    private val KEY_SUMA_DESCANSO = intPreferencesKey("suma_descanso")
+    private val KEY_DIAS_EVALUADOS = intPreferencesKey("dias_evaluados")
+
     private val AVISO_T1 = booleanPreferencesKey("aviso_trimestre_1")
     private val AVISO_T2 = booleanPreferencesKey("aviso_trimestre_14")
     private val AVISO_T3 = booleanPreferencesKey("aviso_trimestre_28")
@@ -44,7 +53,14 @@ class PetPrefs(private val context: Context) {
             descanso = prefs[KEY_DESCANSO] ?: 100,
             limpieza = prefs[KEY_HIGIENE] ?: 100,
             semanaEmbarazo = prefs[KEY_SEMANA] ?: 1,
-            diaEmbarazo = prefs[KEY_DIA] ?:1
+            diaEmbarazo = prefs[KEY_DIA] ?: 1,
+            sumaEnergia = prefs[KEY_SUMA_ENERGIA] ?: 0,
+            sumaHambre = prefs[KEY_SUMA_HAMBRE] ?: 0,
+            sumaSed = prefs[KEY_SUMA_SED] ?: 0,
+            sumaLimpieza = prefs[KEY_SUMA_LIMPIEZA] ?: 0,
+            sumaActividad = prefs[KEY_SUMA_ACTIVIDAD] ?: 0,
+            sumaDescanso = prefs[KEY_SUMA_DESCANSO] ?: 0,
+            diasEvaluados = prefs[KEY_DIAS_EVALUADOS] ?: 0
         )
     }
 
@@ -58,7 +74,13 @@ class PetPrefs(private val context: Context) {
             prefs[KEY_HIGIENE] = pet.limpieza
             prefs[KEY_SEMANA] = pet.semanaEmbarazo
             prefs[KEY_DIA] = pet.diaEmbarazo
-
+            prefs[KEY_SUMA_ENERGIA] = pet.sumaEnergia
+            prefs[KEY_SUMA_HAMBRE] = pet.sumaHambre
+            prefs[KEY_SUMA_SED] = pet.sumaSed
+            prefs[KEY_SUMA_LIMPIEZA] = pet.sumaLimpieza
+            prefs[KEY_SUMA_ACTIVIDAD] = pet.sumaActividad
+            prefs[KEY_SUMA_DESCANSO] = pet.sumaDescanso
+            prefs[KEY_DIAS_EVALUADOS] = pet.diasEvaluados
         }
     }
 

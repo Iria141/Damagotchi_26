@@ -51,7 +51,6 @@ import com.example.damagotchi_26.ui.components.calcularDiaYSemana
 fun SeguimientoScreem(
     rol: String,
     fechaUltimaRegla: Long,
-    nombre: String,
     onBack: () -> Unit = {},
     onAddAnuncioClick: () -> Unit = {},
     onAnuncioClick: (
@@ -358,7 +357,6 @@ fun SeguimientoScreenPreview() {
         SeguimientoScreem(
             rol = "mamá",
             fechaUltimaRegla = 1735689600000L,
-            nombre = "Iria",
             onAnuncioClick = { _, _, _, _, _, _ -> }
         )
     }

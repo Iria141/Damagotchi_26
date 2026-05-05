@@ -1,4 +1,4 @@
-package com.example.damagotchi_26.ui.rooms
+package com.example.damagotchi_26.ui.evaluacion
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -97,7 +97,7 @@ fun PerdidaEmbarazoScreen(
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
                     ) {
                         Text(
-                            text = "Volver al menu",
+                            text = "Volver",
                             fontSize = 15.sp,
                             color = Color.White.copy(alpha = 0.8f)
                         )

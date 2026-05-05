@@ -11,12 +11,12 @@ import androidx.compose.ui.unit.dp
 import com.example.damagotchi_26.domain.MomentoDia
 import com.example.damagotchi_26.ui.rooms.BathRoom
 import com.example.damagotchi_26.ui.rooms.BedRoom
-import com.example.damagotchi_26.ui.rooms.Clinic
+import com.example.damagotchi_26.ui.rooms.EvaluacionFinalScreen
 import com.example.damagotchi_26.ui.rooms.Kitchen
 import com.example.damagotchi_26.ui.rooms.LivingRoom
 import com.example.damagotchi_26.ui.rooms.Park
-import com.example.damagotchi_26.ui.rooms.PerdidaDefinitivaScreen
-import com.example.damagotchi_26.ui.rooms.PerdidaEmbarazoScreen
+import com.example.damagotchi_26.ui.evaluacion.PerdidaDefinitivaScreen
+import com.example.damagotchi_26.ui.evaluacion.PerdidaEmbarazoScreen
 import com.example.damagotchi_26.viewmodel.PetViewModel
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -28,11 +28,13 @@ fun RoomsPagerScreen(
     petViewModel: PetViewModel,
     momentoDia: StateFlow<MomentoDia>,
     nombre: String,
-    rol: String
+    rol: String,
+    onVolverMenu: () -> Unit = {}
 ) {
     val petEstado by petViewModel.pet.collectAsState(initial = null)
     val perdidaEmbarazo by transicionViewModel.perdidaEmbarazo.collectAsState()
     val perdidaDefinitiva by transicionViewModel.perdidaDefinitiva.collectAsState()
+    var mostrarEvaluacion by remember { mutableStateOf(false) }
 
     if (petEstado == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -42,7 +44,7 @@ fun RoomsPagerScreen(
     }
 
     val pet = petEstado!!
-    val rooms = listOf("Salón", "Cocina", "Dormitorio", "Baño", "Parque", "Consulta Médica")
+    val rooms = listOf("Salón", "Cocina", "Dormitorio", "Baño", "Parque")
     val pagerState = rememberPagerState(pageCount = { rooms.size })
 
 
@@ -52,9 +54,10 @@ fun RoomsPagerScreen(
             rol = rol)
     }
 
-    // Comprueba pérdida cada vez que cambia el día
+    // Comprueba pérdida y acumula medidores cada vez que cambia el día
     val diaActual by transicionViewModel.diaActual.collectAsState()
     LaunchedEffect(diaActual) {
+        petViewModel.acumularDia()
         transicionViewModel.comprobarPerdida(
             energia = pet.energia,
             hambre = pet.hambre,
@@ -66,8 +69,6 @@ fun RoomsPagerScreen(
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
-
-
 
 
     Scaffold(
@@ -156,12 +157,6 @@ fun RoomsPagerScreen(
                         estirar = { petViewModel.estirar() }
                     )
 
-                    5 -> Clinic(
-                        pet = pet,
-                        rol = rol,
-                        transicionViewModel = transicionViewModel
-                    )
-
                 }
             }
         }
@@ -181,11 +176,20 @@ fun RoomsPagerScreen(
     }
 
     // Pantalla de pérdida definitiva — segunda vez
-    if (perdidaDefinitiva) {
+    if (perdidaDefinitiva && !mostrarEvaluacion) {
         PerdidaDefinitivaScreen(
             onVerEvaluacion = {
-                // Navegar a evaluación final — se implementará próximamente
+                mostrarEvaluacion = true
             }
+        )
+    }
+
+    // Evaluación final — al llegar a semana 40 O tras pérdida definitiva
+    if (pet.semanaEmbarazo >= 40 || mostrarEvaluacion) {
+        EvaluacionFinalScreen(
+            pet = pet,
+            perdidaDefinitiva = perdidaDefinitiva,
+            onVolverMenu = onVolverMenu
         )
     }
 }

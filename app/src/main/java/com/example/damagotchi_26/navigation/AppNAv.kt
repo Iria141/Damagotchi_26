@@ -135,7 +135,12 @@ fun AppNav(
                 petViewModel = petViewModel,
                 momentoDia = momentoDia,
                 nombre = userProfile?.nombre ?: "Usuario",
-                rol = userProfile?.rol ?: "Otro"
+                rol = userProfile?.rol ?: "Otro",
+                onVolverMenu = {
+                    navController.navigate(Route.Menu.path) {
+                        popUpTo(Route.Rooms.path) { inclusive = true }
+                    }
+                }
             )
         }
 
@@ -218,9 +223,12 @@ fun AppNav(
 
 
         composable(Route.Menu.path) {
+            val petEstado by petViewModel.pet.collectAsState(initial = null)
             Menu(
                 rol = userProfile?.rol ?: "Otro",
                 nombre = userProfile?.nombre ?: "Usuario",
+                pet = petEstado,
+                fechaUltimaRegla = userProfile?.fechaUltimaRegla ?: 0L,
                 onPlayClick = {
                     navController.navigate(Route.Rooms.path)
                     { launchSingleTop = true }
@@ -236,8 +244,8 @@ fun AppNav(
                 onConfiguracionClick = {
                     navController.navigate(Route.Settings.path)
                     { launchSingleTop = true }
-                }
-             /*   ,onAyudaClick = {
+                },
+                onAyudaClick = {
                     // Pantalla de ayuda pendiente de implementar
                 },
                 onCerrarSesionClick = {
@@ -247,7 +255,7 @@ fun AppNav(
                         popUpTo(0) { inclusive = true }
                         launchSingleTop = true
                     }
-                }*/
+                }
             )
         }
 
@@ -280,7 +288,6 @@ fun AppNav(
             SeguimientoScreem(
                 rol = userProfile?.rol ?: "Otro",
                 fechaUltimaRegla = userProfile?.fechaUltimaRegla ?: 0L,
-                nombre = userProfile?.nombre ?: "Usuario",
                 onBack = { navController.popBackStack() },
                 onAddAnuncioClick = {
                     navController.navigate(Route.CrearAnuncioAdmin.path)

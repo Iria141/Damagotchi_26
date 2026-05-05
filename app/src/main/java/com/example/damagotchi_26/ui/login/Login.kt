@@ -26,9 +26,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.Image
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.damagotchi_26.R
 import com.example.damagotchi_26.ui.Color.Color.PurpleBlueText
 import com.example.damagotchi_26.ui.components.AuthBackground
 import com.example.damagotchi_26.ui.components.AuthCard
@@ -70,9 +76,29 @@ fun Login(
     AuthBackground {
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(16.dp))
+            // Logo y nombre de la app
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo Damagotchi",
+                modifier = Modifier.size(100.dp)
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Damagotchi",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = PurpleBlueText,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "Tu compañero de embarazo",
+                fontSize = 14.sp,
+                color = PurpleBlueText.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center
+            )
 
             AuthCard {
                 AuthTextField(

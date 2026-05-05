@@ -193,6 +193,19 @@ class PetViewModel(
         )
     }
 
+    // Acumula medidores del día para la evaluación final
+    fun acumularDia() = actualizar { actual ->
+        actual.copy(
+            sumaEnergia = actual.sumaEnergia + actual.energia,
+            sumaHambre = actual.sumaHambre + actual.hambre,
+            sumaSed = actual.sumaSed + actual.sed,
+            sumaLimpieza = actual.sumaLimpieza + actual.limpieza,
+            sumaActividad = actual.sumaActividad + actual.actividad,
+            sumaDescanso = actual.sumaDescanso + actual.descanso,
+            diasEvaluados = actual.diasEvaluados + 1
+        )
+    }
+
     fun avanzarSemana() = actualizar { actual ->
         actual.copy(
             semanaEmbarazo = (actual.semanaEmbarazo + 1).coerceAtMost(40)
@@ -216,9 +229,20 @@ class PetViewModel(
 
         actual.copy(
             diaEmbarazo = nuevoDia,
-            semanaEmbarazo = nuevaSemana.coerceAtMost(40)
+            semanaEmbarazo = nuevaSemana.coerceAtMost(40),
+
+            sumaEnergia = actual.sumaEnergia + actual.energia,
+            sumaHambre = actual.sumaHambre + actual.hambre,
+            sumaSed = actual.sumaSed + actual.sed,
+            sumaLimpieza = actual.sumaLimpieza + actual.limpieza,
+            sumaActividad = actual.sumaActividad + actual.actividad,
+            sumaDescanso = actual.sumaDescanso + actual.descanso,
+            diasEvaluados = actual.diasEvaluados + 1
         )
     }
+
+
+
 
     private fun actualizar(bloque: (Pet) -> Pet) {
         viewModelScope.launch {
