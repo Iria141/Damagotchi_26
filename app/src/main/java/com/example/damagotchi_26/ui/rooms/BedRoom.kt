@@ -21,6 +21,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.damagotchi_26.R
 import com.example.damagotchi_26.domain.Pet
+import com.example.damagotchi_26.ui.Color.Color.PinkBg
 import com.example.damagotchi_26.ui.components.IconsPanel
 import com.example.damagotchi_26.ui.components.NightOverlay
 import com.example.damagotchi_26.ui.theme.ActionButton
@@ -80,7 +81,9 @@ fun BedRoom(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = PinkBg
+                ),                title = {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally

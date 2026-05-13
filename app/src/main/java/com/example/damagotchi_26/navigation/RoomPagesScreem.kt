@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.damagotchi_26.ui.Color.Color.PinkBg
 import com.example.damagotchi_26.domain.MomentoDia
 import com.example.damagotchi_26.ui.rooms.BathRoom
 import com.example.damagotchi_26.ui.rooms.BedRoom
@@ -72,6 +73,7 @@ fun RoomsPagerScreen(
 
 
     Scaffold(
+        containerColor = PinkBg,
         snackbarHost = {
             Box(
                 modifier = Modifier.fillMaxSize()

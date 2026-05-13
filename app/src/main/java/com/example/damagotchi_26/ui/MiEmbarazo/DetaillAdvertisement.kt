@@ -1,12 +1,13 @@
 package com.example.damagotchi_26.ui.MiEmbarazo
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,6 +45,7 @@ fun DetalleAnuncioScreen(
     contenido: String,
     semanaGestacion: Int,
     fuente: String,
+    imagenUrl: String,
     onBack: () -> Unit
 ) {
 var visible by remember { mutableStateOf(false) }
@@ -94,6 +95,19 @@ var visible by remember { mutableStateOf(false) }
 
                 Spacer(modifier = Modifier.height(18.dp))
 
+                if (imagenUrl.isNotBlank()) {
+                    AsyncImage(
+                        model = imagenUrl,
+                        contentDescription = titulo,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(210.dp)
+                            .clip(RoundedCornerShape(24.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Spacer(modifier = Modifier.height(18.dp))
+                }
                 SweetSectionCard(
                     title = "Categoría",
                     emoji = obtenerEmoji(categoria),
@@ -142,6 +156,9 @@ private fun formatearCategoria(categoria: String): String {
         "alimentacion" -> "Alimentación"
         "salud" -> "Salud"
         "recursos" -> "Recursos"
+        "descanso" -> "Descanso"
+        "bienestar_emocional" -> "Bienestar emocional"
+        "desarrollo_bebe" -> "Desarrollo del bebé"
         else -> categoria.replaceFirstChar { it.uppercase() }
     }
 }
@@ -153,9 +170,10 @@ fun DetalleAnuncioScreenPreview() {
         DetalleAnuncioScreen(
             titulo = "Hidratación en el embarazo",
             categoria = "hidratacion",
-            contenido = "Beber agua con frecuencia ayuda a mantener un buen bienestar general durante el embarazo. También puede ayudar a reducir la sensación de cansancio y favorecer hábitos saludables en el día a día.",
+            contenido = "Beber agua con frecuencia ayuda a mantener un buen bienestar general durante el embarazo.",
             semanaGestacion = 24,
             fuente = "OMS",
+            imagenUrl = "https://images.unsplash.com/photo-1502741338009-cac2772e18bc",
             onBack = {}
         )
     }

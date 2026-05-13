@@ -4,6 +4,7 @@ package com.example.damagotchi_26.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.damagotchi_26.data.PetPrefs
+import com.example.damagotchi_26.data.TimeConfig
 import com.example.damagotchi_26.domain.MomentoDia
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -181,13 +182,3 @@ class TransicionViewModel (
 
 }
 
-
-object TimeConfig { //MODO PRESENTACION -- ACTIVAR DEBUG
-    const val DEBUG = true // false en producción
-    const val SEGUNDO = 1_000L
-    const val MINUTO = 60 * SEGUNDO
-    const val HORA = 60 * MINUTO
-
-    const val CICLO_LUZ_DEBUG = 5 * SEGUNDO        // 5 segundos
-    const val CICLO_LUZ_REAL = (1.24 * HORA).toLong()
-}

@@ -1,8 +1,10 @@
 package com.example.damagotchi_26.ui.Community
 
 import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.FilterChip
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -158,11 +160,27 @@ fun CreatePostScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         availableTypes.forEach { type ->
-                            TypeOptionChip(
-                                text = type,
+                            FilterChip(
                                 selected = selectedType == type,
                                 onClick = { selectedType = type },
-                                modifier = Modifier.weight(1f)
+
+                                label = {
+                                    Text(
+                                        text = type.replaceFirstChar { it.uppercase() },
+                                        fontWeight = if (selectedType == type)
+                                            FontWeight.Bold
+                                        else
+                                            FontWeight.Normal,
+
+                                        fontSize = 14.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                },
+
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp) // ← más altura
                             )
                         }
                     }
@@ -197,36 +215,6 @@ fun CreatePostScreen(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun TypeOptionChip(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (selected) PurpleBtn else CardGray
-        )
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = text.replaceFirstChar { it.uppercase() },
-                color = if (selected) Color.White else PurpleBlueText,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp
-            )
         }
     }
 }

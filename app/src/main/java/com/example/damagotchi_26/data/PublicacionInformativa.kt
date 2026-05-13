@@ -12,7 +12,8 @@ data class PublicacionInformativa(
     val fuente: String = "",
     val fuenteURL: String = "",
     val fechaCreacion: Long = System.currentTimeMillis(),
-    val creadaAdmin: Boolean = true
+    val creadaAdmin: Boolean = true,
+    val imagenUrl: String = ""
 )
 
 object CategoriaInformativa {
@@ -21,6 +22,9 @@ object CategoriaInformativa {
     const val ALIMENTACION = "alimentacion"
     const val SALUD = "salud"
     const val RECURSOS = "recursos"
+    const val DESCANSO = "descanso"
+    const val BIENESTAR_EMOCIONAL = "bienestar_emocional"
+    const val DESARROLLO_BEBE = "desarrollo_bebe"
 }
 
 object RolUsuario {

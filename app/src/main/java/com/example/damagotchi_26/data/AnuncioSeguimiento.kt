@@ -11,6 +11,7 @@ data class AnuncioSeguimiento(
     val fuente: String = "",
     val urlFuente: String = "",
     val autorUid: String = "",
+    val imagenUrl: String = "",
     val fechaCreacion: Long = System.currentTimeMillis()
 )
 

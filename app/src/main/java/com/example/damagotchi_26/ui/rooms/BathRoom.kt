@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -15,6 +16,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.damagotchi_26.R
 import com.example.damagotchi_26.domain.Pet
+import com.example.damagotchi_26.ui.Color.Color.PinkBg
 import com.example.damagotchi_26.ui.components.IconsPanel
 import com.example.damagotchi_26.ui.components.NightOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.BanoOverlay
@@ -41,6 +43,9 @@ fun BathRoom(
     Scaffold(
         topBar = {
             TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = PinkBg
+                ),
                 title = {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -105,7 +110,7 @@ fun BathRoom(
                 )
                 ActionButton(
                     image = R.drawable.cepillo,
-                    text = "Cepilla los diente",
+                    text = "Cepillar",
                     onClick = {
                         if (accionActiva == AccionBano.NINGUNA)
                             accionActiva = AccionBano.DIENTES
@@ -113,7 +118,7 @@ fun BathRoom(
                 )
                 ActionButton(
                     image = R.drawable.crema,
-                    text = "Crema corporal",
+                    text = "Crema",
                     onClick = {
                         if (accionActiva == AccionBano.NINGUNA)
                             accionActiva = AccionBano.CREMA

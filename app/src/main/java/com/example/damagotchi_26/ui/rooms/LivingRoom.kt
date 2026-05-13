@@ -16,6 +16,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.damagotchi_26.R
 import com.example.damagotchi_26.domain.Pet
+import com.example.damagotchi_26.ui.Color.Color.PinkBg
 import com.example.damagotchi_26.ui.components.IconsPanel
 import com.example.damagotchi_26.ui.components.NightOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.PianoOverlay
@@ -23,7 +24,7 @@ import com.example.damagotchi_26.ui.components.OverlyRooms.PintarOverlay
 import com.example.damagotchi_26.ui.theme.ActionButton
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 
-private enum class AccionSalon { NINGUNA, PIANO, PUZZLE, PINTAR }
+private enum class AccionSalon { NINGUNA, PIANO, PINTAR }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +42,9 @@ fun LivingRoom(
     Scaffold(
         topBar = {
             TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = PinkBg
+                ),
                 title = {
                     Column(
                         modifier = Modifier.fillMaxWidth(),

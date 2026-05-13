@@ -59,7 +59,9 @@ fun SeguimientoScreem(
         contenido: String,
         semanaGestacion: Int,
         fuente: String,
-    ) -> Unit = { _, _, _, _, _-> },
+        imagenUrl: String,
+
+    ) -> Unit = { _, _, _, _, _, _-> },
 ) {
     val esMama = rol.lowercase() == "mamá" || rol.lowercase() == "mama"
     val titulo = if (esMama) "Mi embarazo" else "Seguimiento"
@@ -93,17 +95,23 @@ fun SeguimientoScreem(
         CategoriaInformativa.MASCOTAS to "🐾 Mascotas",
         CategoriaInformativa.ALIMENTACION to "🥦 Alimentación",
         CategoriaInformativa.SALUD to "🩺 Salud",
-        CategoriaInformativa.RECURSOS to "📚 Recursos"
+        CategoriaInformativa.RECURSOS to "📚 Recursos",
+        CategoriaInformativa.DESCANSO to "😴 Descanso",
+        CategoriaInformativa.BIENESTAR_EMOCIONAL to "🧘 Bienestar emocional",
+        CategoriaInformativa.DESARROLLO_BEBE to "👶 Desarrollo del bebé"
     )
 
     LaunchedEffect(Unit) {
         getAnunciosSeguimiento { lista, error ->
+            cargando = false
+
             if (error != null) {
+                errorCarga = error
                 Toast.makeText(context, error, Toast.LENGTH_LONG).show()
             } else {
+                errorCarga = null
                 anuncios.clear()
                 anuncios.addAll(lista)
-                cargando = false
             }
         }
     }
@@ -289,6 +297,7 @@ fun SeguimientoScreem(
                                         anuncio.contenido,
                                         anuncio.semanaGestacion,
                                         anuncio.fuente,
+                                        anuncio.imagenUrl
                                     )
                                 },
                             )
@@ -332,6 +341,9 @@ fun obtenerColorCategoria(categoria: String): Color {
         "alimentacion" -> Color(0xFFFFE0B2)
         "salud" -> Color(0xFFF8BBD0)
         "recursos" -> Color(0xFFFFECB3)
+        "descanso" -> Color(0xFFE3F2FD)
+        "bienestar_emocional" -> Color(0xFFE8F5E9)
+        "desarrollo_bebe" -> Color(0xFFFFF3E0)
         else -> Color(0xFFE0E0E0)
     }
 }
@@ -344,6 +356,9 @@ fun obtenerEmoji(categoria: String): String {
         CategoriaInformativa.ALIMENTACION -> "🥦"
         CategoriaInformativa.SALUD -> "🩺"
         CategoriaInformativa.RECURSOS -> "📚"
+        CategoriaInformativa.DESCANSO -> "😴"
+        CategoriaInformativa.BIENESTAR_EMOCIONAL -> "🧘"
+        CategoriaInformativa.DESARROLLO_BEBE -> "👶"
         else -> "✨"
     }
 }
@@ -355,7 +370,7 @@ fun SeguimientoScreenPreview() {
         SeguimientoScreem(
             rol = "mamá",
             fechaUltimaRegla = 1735689600000L,
-            onAnuncioClick = { _, _, _, _, _-> }
+            onAnuncioClick = { _, _, _, _, _, _ -> }
         )
     }
 }

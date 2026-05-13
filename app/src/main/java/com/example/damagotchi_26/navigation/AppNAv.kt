@@ -299,13 +299,14 @@ fun AppNav(
                 onAddAnuncioClick = {
                     navController.navigate(Route.CrearAnuncioAdmin.path)
                 },
-                onAnuncioClick = { titulo, categoria, contenido, semanaGestacion, fuente ->
+                onAnuncioClick = { titulo, categoria, contenido, semanaGestacion, fuente, imagenUrl ->
                     val ruta = "detalle_anuncio/" +
                             Uri.encode(titulo) + "/" +
                             Uri.encode(categoria) + "/" +
                             Uri.encode(contenido) + "/" +
                             semanaGestacion + "/" +
-                            Uri.encode(fuente)
+                            Uri.encode(fuente) + "/" +
+                            Uri.encode(imagenUrl)
 
                     navController.navigate(ruta)
                 }
@@ -373,6 +374,7 @@ fun AppNav(
                 contenido = contenido,
                 semanaGestacion = semanaGestacion,
                 fuente = fuente,
+                imagenUrl = "",
                 onBack = { navController.popBackStack() }
             )
         }
