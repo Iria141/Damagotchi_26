@@ -1,6 +1,9 @@
 package com.example.damagotchi_26.ui.login
 
 import android.util.Log
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.SpanStyle
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -94,7 +98,7 @@ fun Login(
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "Tu compañero de embarazo",
+                text = "Tu compañera de embarazo",
                 fontSize = 14.sp,
                 color = PurpleBlueText.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
@@ -144,7 +148,8 @@ fun Login(
                     ) {
                         Text(
                             style = textStyle,
-                            text = "Restablecer Contraseña"
+                            text = "Restablecer Contraseña",
+                            textDecoration = TextDecoration.Underline
                         )
                     }
                 }
@@ -180,7 +185,12 @@ fun Login(
                         )
                     ) {
                         Text(
-                            text = "No tengo cuenta. DAR DE ALTA",
+                            text = buildAnnotatedString {
+                                append("No tengo cuenta. ")
+                                withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
+                                    append("DAR DE ALTA")
+                                }
+                            },
                             style = textStyle
                         )
                     }

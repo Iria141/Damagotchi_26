@@ -56,7 +56,7 @@ class PetViewModel(
 
     fun alimentar() = actualizar { actual ->
         actual.copy(
-            hambre = limitar(actual.hambre + 15),
+            hambre = limitar(actual.hambre + 25),
             energia = limitar(actual.energia + 15),
             limpieza = limitar(actual.limpieza - 2),
             actividad = limitar(actual.actividad - 1),

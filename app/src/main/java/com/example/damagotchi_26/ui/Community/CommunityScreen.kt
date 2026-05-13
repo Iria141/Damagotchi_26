@@ -326,7 +326,19 @@ fun CommunityScreen(
                                     onLikeChanged = { postId, diLike ->
                                         if (diLike) misLikes.add(postId)
                                         else misLikes.remove(postId)
-                                    }
+                                    },
+                                    onEliminarPost = if (rol.lowercase() == "admin") { postId ->
+                                        publicacionesRepository.eliminarPost(
+                                            postId = postId,
+                                            onOk = {
+                                                posts.removeAll { it.id == postId }
+                                                Toast.makeText(context, "Publicación eliminada", Toast.LENGTH_SHORT).show()
+                                            },
+                                            onError = { error ->
+                                                Toast.makeText(context, "Error: $error", Toast.LENGTH_LONG).show()
+                                            }
+                                        )
+                                    } else null
                                 )
                             }
                         }

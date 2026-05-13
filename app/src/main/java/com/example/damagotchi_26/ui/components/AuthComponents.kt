@@ -131,6 +131,7 @@ fun AuthTextField(
     readOnly: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
     singleLine: Boolean = true,
+    minLines: Int = 2,
     modifier: Modifier = Modifier
 
 ) {
@@ -545,7 +546,8 @@ fun PostCardExpandible(
     nombre: String = "",
     index: Int = 0,
     expandidoExterno: Boolean = false,
-    onLikeChanged: (postId: String, diLike: Boolean) -> Unit = { _, _ -> }
+    onLikeChanged: (postId: String, diLike: Boolean) -> Unit = { _, _ -> },
+    onEliminarPost: ((postId: String) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val comentarioRepository = remember { ComentarioRepository() }
@@ -726,6 +728,33 @@ fun PostCardExpandible(
                         contentDescription = if (expandido) "Ocultar" else "Ver respuestas",
                         tint = PurpleBtn
                     )
+                }
+
+                // Botón eliminar — solo admin
+                if (onEliminarPost != null && rol.lowercase() == "admin") {
+                    var confirmar by remember { mutableStateOf(false) }
+                    if (!confirmar) {
+                        TextButton(onClick = { confirmar = true }) {
+                            Text(
+                                text = "🗑️",
+                                fontSize = 16.sp
+                            )
+                        }
+                    } else {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            TextButton(onClick = { confirmar = false }) {
+                                Text("Cancelar", color = Color.Gray, fontSize = 12.sp)
+                            }
+                            TextButton(onClick = { onEliminarPost(post.id) }) {
+                                Text(
+                                    "Eliminar",
+                                    color = Color(0xFFB00020),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
                 }
             }
 

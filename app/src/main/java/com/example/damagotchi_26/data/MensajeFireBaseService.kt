@@ -1,17 +1,19 @@
-package com.example.damagotchi_26
+package com.example.damagotchi_26.data
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.example.damagotchi_26.MainActivity
+import com.example.damagotchi_26.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+
 
 class MensajeFirebaseService : FirebaseMessagingService() {
 
@@ -20,6 +22,7 @@ class MensajeFirebaseService : FirebaseMessagingService() {
         guardarTokenEnFirebase(token)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
@@ -42,7 +45,7 @@ class MensajeFirebaseService : FirebaseMessagingService() {
     private fun mostrarNotificacion(titulo: String, cuerpo: String) {
         val canalId = "comunidad_canal"
         val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         val canal = NotificationChannel(
             canalId,

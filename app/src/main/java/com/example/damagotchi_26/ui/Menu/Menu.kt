@@ -167,7 +167,7 @@ fun Menu(
                     onClick = onPlayClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(280.dp),
+                        .height(270.dp),
                     shape = RoundedCornerShape(32.dp),
                     elevation = CardDefaults.cardElevation(10.dp),
                     colors = CardDefaults.cardColors(containerColor = PurpleBtn)
@@ -212,9 +212,11 @@ fun Menu(
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Text(
-                            text = "Cuida a tu personaje",
+                            text = "Explora las estancias y cuida de tu peronaje",
                             fontSize = 13.sp,
-                            color = Color.White.copy(alpha = 0.85f)
+                            color = Color.White.copy(alpha = 0.85f),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         )
                     }
                 }

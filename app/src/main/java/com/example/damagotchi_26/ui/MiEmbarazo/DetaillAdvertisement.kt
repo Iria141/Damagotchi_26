@@ -45,7 +45,6 @@ fun DetalleAnuncioScreen(
     contenido: String,
     semanaGestacion: Int,
     fuente: String,
-    urlFuente: String,
     onBack: () -> Unit
 ) {
 var visible by remember { mutableStateOf(false) }
@@ -157,7 +156,6 @@ fun DetalleAnuncioScreenPreview() {
             contenido = "Beber agua con frecuencia ayuda a mantener un buen bienestar general durante el embarazo. También puede ayudar a reducir la sensación de cansancio y favorecer hábitos saludables en el día a día.",
             semanaGestacion = 24,
             fuente = "OMS",
-            urlFuente = "https://www.who.int",
             onBack = {}
         )
     }

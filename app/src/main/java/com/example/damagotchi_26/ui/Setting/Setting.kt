@@ -71,6 +71,7 @@ fun ConfiguracionScreen(
 
     // Estado perfil
     var fechaNacimiento by remember { mutableStateOf("") }
+    var nombre by remember { mutableStateOf("") }
     var fechaUltimaRegla by remember { mutableStateOf("") }
     var fechaUltimaReglaTimestamp by remember { mutableStateOf(0L) }
     var sexoBebe by remember { mutableStateOf("") }
@@ -103,6 +104,7 @@ fun ConfiguracionScreen(
         db.collection("users").document(uid).get()
             .addOnSuccessListener { doc ->
                 fechaNacimiento = doc.getString("fechaNacimiento") ?: ""
+                nombre = doc.getString("nombre") ?: ""
                 sexoBebe = doc.getString("sexoBebe") ?: ""
                 val timestamp = doc.getLong("fechaUltimaRegla") ?: 0L
                 if (timestamp > 0L) {
@@ -367,6 +369,13 @@ fun ConfiguracionScreen(
                             Spacer(modifier = Modifier.height(12.dp))
                             ConfigCard {
                                 OutlinedTextField(
+                                    value = nombre,
+                                    onValueChange = { nombre = it },
+                                    label = { Text("Nombre") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                Spacer(modifier = Modifier.height(14.dp))
+                                OutlinedTextField(
                                     value = fechaNacimiento,
                                     onValueChange = {},
                                     label = { Text("Fecha de nacimiento") },
@@ -455,6 +464,7 @@ fun ConfiguracionScreen(
                             if (uid == null) return@PrimaryAuthButton
                             guardando = true
                             val datos = mapOf(
+                                "nombre" to nombre,
                                 "fechaNacimiento" to fechaNacimiento,
                                 "fechaUltimaRegla" to fechaUltimaReglaTimestamp,
                                 "sexoBebe" to sexoBebe,

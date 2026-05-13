@@ -89,7 +89,9 @@ fun CreatePostScreen(
 
                 Text(
                     text = "Comparte una duda, una opinión o una experiancia  con la comunidad",
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
                     textAlign = TextAlign.Center,
                     fontSize = 15.sp,
                     color = Color.Gray
@@ -127,7 +129,8 @@ fun CreatePostScreen(
                             }
                         },
                         label = "Contenido (${contenido.length}/$maxContenido)",
-                        singleLine = false
+                        singleLine = false,
+                        minLines = 2
                     )
                     if (contenidoError) {
                         Text(

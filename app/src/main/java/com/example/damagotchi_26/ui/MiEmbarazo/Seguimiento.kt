@@ -59,8 +59,7 @@ fun SeguimientoScreem(
         contenido: String,
         semanaGestacion: Int,
         fuente: String,
-        urlFuente: String
-    ) -> Unit = { _, _, _, _, _, _ -> },
+    ) -> Unit = { _, _, _, _, _-> },
 ) {
     val esMama = rol.lowercase() == "mamá" || rol.lowercase() == "mama"
     val titulo = if (esMama) "Mi embarazo" else "Seguimiento"
@@ -290,7 +289,6 @@ fun SeguimientoScreem(
                                         anuncio.contenido,
                                         anuncio.semanaGestacion,
                                         anuncio.fuente,
-                                        anuncio.urlFuente
                                     )
                                 },
                             )
@@ -357,7 +355,7 @@ fun SeguimientoScreenPreview() {
         SeguimientoScreem(
             rol = "mamá",
             fechaUltimaRegla = 1735689600000L,
-            onAnuncioClick = { _, _, _, _, _, _ -> }
+            onAnuncioClick = { _, _, _, _, _-> }
         )
     }
 }

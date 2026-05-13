@@ -31,6 +31,7 @@ import com.example.damagotchi_26.repository.agregarAnuncioSeguimiento
 import com.example.damagotchi_26.ui.Community.CommunityScreen
 import com.example.damagotchi_26.ui.Community.CreatePostScreen
 import com.example.damagotchi_26.ui.Configuracion.ConfiguracionScreen
+import com.example.damagotchi_26.ui.Help.AyudaScreen
 import com.example.damagotchi_26.ui.Menu.Menu
 import com.example.damagotchi_26.ui.MiEmbarazo.CrearAnuncioAdmin
 import com.example.damagotchi_26.ui.MiEmbarazo.DetalleAnuncioScreen
@@ -246,7 +247,7 @@ fun AppNav(
                     { launchSingleTop = true }
                 },
                 onAyudaClick = {
-                    // Pantalla de ayuda pendiente de implementar
+                    navController.navigate("ayuda") { launchSingleTop = true }
                 },
                 onCerrarSesionClick = {
                     FirebaseAuth.getInstance().signOut()
@@ -261,6 +262,12 @@ fun AppNav(
 
         composable(Route.Settings.path) {
             ConfiguracionScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("ayuda") {
+            AyudaScreen(
                 onBack = { navController.popBackStack() }
             )
         }
@@ -292,14 +299,13 @@ fun AppNav(
                 onAddAnuncioClick = {
                     navController.navigate(Route.CrearAnuncioAdmin.path)
                 },
-                onAnuncioClick = { titulo, categoria, contenido, semanaGestacion, fuente, urlFuente ->
+                onAnuncioClick = { titulo, categoria, contenido, semanaGestacion, fuente ->
                     val ruta = "detalle_anuncio/" +
                             Uri.encode(titulo) + "/" +
                             Uri.encode(categoria) + "/" +
                             Uri.encode(contenido) + "/" +
                             semanaGestacion + "/" +
-                            Uri.encode(fuente) + "/" +
-                            Uri.encode(urlFuente)
+                            Uri.encode(fuente)
 
                     navController.navigate(ruta)
                 }
@@ -360,7 +366,6 @@ fun AppNav(
             val contenido = backStackEntry.arguments?.getString("contenido") ?: ""
             val semanaGestacion = backStackEntry.arguments?.getString("semanaGestacion")?.toIntOrNull() ?: 1
             val fuente = backStackEntry.arguments?.getString("fuente") ?: ""
-            val urlFuente = backStackEntry.arguments?.getString("urlFuente") ?: ""
 
             DetalleAnuncioScreen(
                 titulo = titulo,
@@ -368,7 +373,6 @@ fun AppNav(
                 contenido = contenido,
                 semanaGestacion = semanaGestacion,
                 fuente = fuente,
-                urlFuente = urlFuente,
                 onBack = { navController.popBackStack() }
             )
         }

@@ -44,21 +44,30 @@ class PublicacionesRepository {
             return
         }
 
-        val post = hashMapOf(
-            "authorId" to uid,
-            "authorName" to authorName,
-            "authorRole" to authorRole,
-            "title" to titulo,
-            "content" to contenido,
-            "type" to tipo,
-            "isPinned" to (authorRole.lowercase() == "admin" && tipo == "anuncio"),
-            "createdAt" to System.currentTimeMillis()
-        )
+        // Consulta el perfil para obtener alias si está activado
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { doc ->
+                val usarAlias = doc.getBoolean("usar_alias") ?: false
+                val alias = doc.getString("alias") ?: ""
+                val nombreFinal = if (usarAlias && alias.isNotBlank()) alias else authorName
 
-        postsCollection
-            .add(post)
-            .addOnSuccessListener { onOk() }
-            .addOnFailureListener { e -> onError(e.message ?: "Error al crear publicación") }
+                val post = hashMapOf(
+                    "authorId" to uid,
+                    "authorName" to nombreFinal,
+                    "authorRole" to authorRole,
+                    "title" to titulo,
+                    "content" to contenido,
+                    "type" to tipo,
+                    "isPinned" to (authorRole.lowercase() == "admin" && tipo == "anuncio"),
+                    "createdAt" to System.currentTimeMillis()
+                )
+
+                postsCollection
+                    .add(post)
+                    .addOnSuccessListener { onOk() }
+                    .addOnFailureListener { e -> onError(e.message ?: "Error al crear publicación") }
+            }
+            .addOnFailureListener { e -> onError(e.message ?: "Error al obtener perfil") }
     }
 
     fun eliminarPost(
@@ -115,19 +124,28 @@ class ComentarioRepository {
             return
         }
 
-        val comentario = hashMapOf(
-            "postId" to postId,
-            "authorId" to uid,
-            "authorName" to authorName,
-            "authorRole" to authorRole,
-            "content" to texto,
-            "createdAt" to System.currentTimeMillis()
-        )
+        // Consulta el perfil para obtener alias si está activado
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { doc ->
+                val usarAlias = doc.getBoolean("usar_alias") ?: false
+                val alias = doc.getString("alias") ?: ""
+                val nombreFinal = if (usarAlias && alias.isNotBlank()) alias else authorName
 
-        comentariosRef(postId)
-            .add(comentario)
-            .addOnSuccessListener { onOk() }
-            .addOnFailureListener { e -> onError(e.message ?: "Error al enviar comentario") }
+                val comentario = hashMapOf(
+                    "postId" to postId,
+                    "authorId" to uid,
+                    "authorName" to nombreFinal,
+                    "authorRole" to authorRole,
+                    "content" to texto,
+                    "createdAt" to System.currentTimeMillis()
+                )
+
+                comentariosRef(postId)
+                    .add(comentario)
+                    .addOnSuccessListener { onOk() }
+                    .addOnFailureListener { e -> onError(e.message ?: "Error al enviar comentario") }
+            }
+            .addOnFailureListener { e -> onError(e.message ?: "Error al obtener perfil") }
     }
 }
 

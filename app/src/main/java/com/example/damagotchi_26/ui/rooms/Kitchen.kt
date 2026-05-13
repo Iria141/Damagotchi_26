@@ -52,7 +52,7 @@ fun Kitchen(
                             lineHeight = 30.sp
                         )
                         Text(
-                            text = "Hambre: ${pet.hambre}%  |  Sed: ${pet.sed}%  |  Acgtividad: ${pet.actividad}%  |  Energía: ${pet.energia}%",
+                            text = "Hambre: ${pet.hambre}%  |  Sed: ${pet.sed}%  |  Actividad: ${pet.actividad}%  |  Energía: ${pet.energia}%",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
