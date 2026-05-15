@@ -7,7 +7,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.input.pointer.pointerInput
@@ -20,7 +19,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.damagotchi_26.R
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -49,7 +47,6 @@ fun PreparacionOverlay(
     onCancelar: () -> Unit
 ) {
     val density = LocalDensity.current
-    val scope = rememberCoroutineScope()
 
     val ingredientes = remember { mutableStateListOf<Ingrediente>() }
     var atrapados by remember { mutableStateOf(0) }
@@ -58,7 +55,7 @@ fun PreparacionOverlay(
     var anchoPanel by remember { mutableStateOf(1080f) }
     var altoPanel by remember { mutableStateOf(1920f) }
 
-    val objetivo = 10
+    val objetivo = 20 // aumentado de 10 a 20
 
     LaunchedEffect(completado) {
         if (completado) {
@@ -74,7 +71,7 @@ fun PreparacionOverlay(
         var idCounter = 0
 
         while (atrapados < objetivo && !completado) {
-            if (totalLanzados < objetivo + 5) { // lanza algunos extra por si se escapan
+            if (totalLanzados < objetivo + 8) { // extras aumentados
                 val x = Random.nextFloat() * (anchoPanel - 120f) + 60f
                 val drawable = ingredientesDrawables.random()
                 ingredientes.add(
@@ -96,7 +93,7 @@ fun PreparacionOverlay(
     // Mueve ingredientes hacia abajo
     LaunchedEffect(Unit) {
         while (!completado) {
-            delay(16) // ~60fps
+            delay(16)
             ingredientes.replaceAll { ing ->
                 if (!ing.atrapado && !ing.fuera) {
                     val nuevaY = ing.y + ing.velocidad
@@ -120,7 +117,6 @@ fun PreparacionOverlay(
         anchoPanel = anchoPx
         altoPanel = altoPx
 
-        // Área de toque para atrapar
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -148,7 +144,6 @@ fun PreparacionOverlay(
                 }
         )
 
-        // Dibuja ingredientes
         ingredientes.filter { !it.atrapado && !it.fuera }.forEach { ing ->
             Image(
                 painter = painterResource(ing.drawable),
@@ -164,7 +159,6 @@ fun PreparacionOverlay(
             )
         }
 
-        // HUD arriba
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)

@@ -81,6 +81,10 @@ fun ConfiguracionScreen(
     var notifNuevaPublicacion by remember { mutableStateOf(true) }
     var notifNuevoComentario by remember { mutableStateOf(true) }
 
+    // Estado audio
+    var musicaActivada by remember { mutableStateOf(true) }
+    var sonidosActivados by remember { mutableStateOf(true) }
+
     // Estado general
     var idioma by remember { mutableStateOf("es") }
     var expandedIdioma by remember { mutableStateOf(false) }
@@ -116,6 +120,8 @@ fun ConfiguracionScreen(
                 idioma = doc.getString("idioma") ?: "es"
                 usarAlias = doc.getBoolean("usar_alias") ?: false
                 alias = doc.getString("alias") ?: ""
+                musicaActivada = doc.getBoolean("musica_activada") ?: true
+                sonidosActivados = doc.getBoolean("sonidos_activados") ?: true
             }
     }
 
@@ -169,13 +175,11 @@ fun ConfiguracionScreen(
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                     color = PurpleBlueText,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Pestañas
                 TabRow(
                     selectedTabIndex = tabSeleccionada,
                     containerColor = Color.Transparent,
@@ -213,7 +217,6 @@ fun ConfiguracionScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Contenido según pestaña
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -221,8 +224,8 @@ fun ConfiguracionScreen(
                 ) {
                     when (tabSeleccionada) {
 
-                        // ── Pestaña General (Notificaciones) ──
                         0 -> {
+                            // Notificaciones
                             SeccionHeader(titulo = "🔔 Notificaciones")
                             Spacer(modifier = Modifier.height(12.dp))
                             ConfigCard {
@@ -246,6 +249,31 @@ fun ConfiguracionScreen(
 
                             Spacer(modifier = Modifier.height(20.dp))
 
+                            // Audio
+                            SeccionHeader(titulo = "🎵 Audio")
+                            Spacer(modifier = Modifier.height(12.dp))
+                            ConfigCard {
+                                FilaSwitch(
+                                    titulo = "Música de fondo",
+                                    descripcion = "Música ambiental durante el modo juego",
+                                    checked = musicaActivada,
+                                    onCheckedChange = { musicaActivada = it }
+                                )
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(vertical = 8.dp),
+                                    color = Color.LightGray.copy(alpha = 0.5f)
+                                )
+                                FilaSwitch(
+                                    titulo = "Sonidos",
+                                    descripcion = "Efectos de sonido en las acciones y minijuegos",
+                                    checked = sonidosActivados,
+                                    onCheckedChange = { sonidosActivados = it }
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            // Idioma
                             SeccionHeader(titulo = "🌍 Idioma")
                             Spacer(modifier = Modifier.height(12.dp))
                             ConfigCard {
@@ -291,6 +319,7 @@ fun ConfiguracionScreen(
 
                             Spacer(modifier = Modifier.height(20.dp))
 
+                            // Privacidad
                             SeccionHeader(titulo = "👁️ Privacidad")
                             Spacer(modifier = Modifier.height(12.dp))
                             ConfigCard {
@@ -313,6 +342,7 @@ fun ConfiguracionScreen(
 
                             Spacer(modifier = Modifier.height(20.dp))
 
+                            // Cuenta
                             SeccionHeader(titulo = "🗑️ Cuenta")
                             Spacer(modifier = Modifier.height(12.dp))
                             ConfigCard {
@@ -363,7 +393,6 @@ fun ConfiguracionScreen(
                             }
                         }
 
-                        // ── Pestaña Mi perfil ──
                         1 -> {
                             SeccionHeader(titulo = "👤 Datos personales")
                             Spacer(modifier = Modifier.height(12.dp))
@@ -472,7 +501,9 @@ fun ConfiguracionScreen(
                                 "notificaciones_nuevo_comentario" to notifNuevoComentario,
                                 "idioma" to idioma,
                                 "usar_alias" to usarAlias,
-                                "alias" to alias
+                                "alias" to alias,
+                                "musica_activada" to musicaActivada,
+                                "sonidos_activados" to sonidosActivados
                             )
                             db.collection("users").document(uid)
                                 .update(datos)

@@ -21,17 +21,20 @@ import com.example.damagotchi_26.ui.Color.Color.PinkBg
 import com.example.damagotchi_26.ui.components.IconsPanel
 import com.example.damagotchi_26.ui.components.NightOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.CaminarOverlay
+import com.example.damagotchi_26.ui.components.OverlyRooms.PelotaOverlay
 import com.example.damagotchi_26.ui.theme.ActionButton
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 
-private enum class AccionParque { NINGUNA, CAMINAR, YOGA, ESTIRAR }
+private enum class AccionParque { NINGUNA, CAMINAR, ESTIRAR, PELOTA }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Park(
     pet: Pet,
     caminar: () -> Unit,
-    estirar: () -> Unit
+    estirar: () -> Unit,
+    jugarPelota: () -> Unit = {},
+    sonidosActivados: Boolean = true
 ) {
     val vm: TransicionViewModel = viewModel()
     val momento by vm.momentoDia.collectAsState()
@@ -104,6 +107,15 @@ fun Park(
                             accionActiva = AccionParque.ESTIRAR
                     }
                 )
+
+                ActionButton(
+                    image = R.drawable.pelota,
+                    text = "Pelota",
+                    onClick = {
+                        if (accionActiva == AccionParque.NINGUNA)
+                            accionActiva = AccionParque.PELOTA
+                    }
+                )
             }
 
             // Overlay Caminar
@@ -121,6 +133,16 @@ fun Park(
                 EstirarOverlay(
                     onCompletado = {
                         estirar()
+                        accionActiva = AccionParque.NINGUNA
+                    }
+                )
+            }
+
+            // Overlay Pelota
+            if (accionActiva == AccionParque.PELOTA) {
+                PelotaOverlay(
+                    onCompletado = {
+                        jugarPelota()
                         accionActiva = AccionParque.NINGUNA
                     }
                 )

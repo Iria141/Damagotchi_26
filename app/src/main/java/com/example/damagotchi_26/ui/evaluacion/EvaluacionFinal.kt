@@ -47,45 +47,36 @@ fun calcularNota(pet: Pet, perdidaDefinitiva: Boolean): NotaFinal {
 fun EvaluacionFinalScreen(
     pet: Pet,
     perdidaDefinitiva: Boolean = false,
-    onVolverMenu: () -> Unit
+    onVolverMenu: () -> Unit,
+    onReiniciarJuego: () -> Unit = {}
 ) {
     val nota = calcularNota(pet, perdidaDefinitiva)
 
     val (emoji, titulo, mensaje, colorFondo, colorCard) = when (nota) {
         NotaFinal.EXCELENTE -> listOf(
-            "🌟",
-            "¡Excelente!",
+            "🌟", "¡Excelente!",
             "¡Felicitaciones! Has cuidado excelentemente a tu personaje durante todo el embarazo.",
-            Color(0xFF1A0A2E),
-            Color(0xFF2A1060)
+            Color(0xFF1A0A2E), Color(0xFF2A1060)
         )
         NotaFinal.BIEN -> listOf(
-            "😊",
-            "¡Bien!",
+            "😊", "¡Bien!",
             "Tu cuidado ha sido bueno, pero podrías mejorar algunos aspectos para el bienestar total del personaje.",
-            Color(0xFF0A1A2E),
-            Color(0xFF103060)
+            Color(0xFF0A1A2E), Color(0xFF103060)
         )
         NotaFinal.MEJORABLE -> listOf(
-            "😐",
-            "Mejorable",
+            "😐", "Mejorable",
             "El personaje ha recibido pocos cuidados, trata de estar más atento la próxima vez.",
-            Color(0xFF1A1A0A),
-            Color(0xFF3A3A10)
+            Color(0xFF1A1A0A), Color(0xFF3A3A10)
         )
         NotaFinal.DEFICIENTE -> listOf(
-            "😞",
-            "Deficiente",
+            "😞", "Deficiente",
             "El personaje ha recibido un cuidado pésimo y ha sufrido debido a la falta de atención. ¡Intenta ser más cuidadoso en el futuro!",
-            Color(0xFF1A0A0A),
-            Color(0xFF3A1010)
+            Color(0xFF1A0A0A), Color(0xFF3A1010)
         )
         NotaFinal.PERDIDA -> listOf(
-            "🖤",
-            "Pérdida del embarazo",
+            "🖤", "Pérdida del embarazo",
             "Lamentablemente, debido a los bajos niveles de cuidado, el personaje ha perdido el embarazo. Te animamos a estar más atento a los medidores de salud para brindar un mejor apoyo en el futuro.",
-            Color(0xFF0A0A0A),
-            Color(0xFF1A0A0A)
+            Color(0xFF0A0A0A), Color(0xFF1A0A0A)
         )
     }
 
@@ -129,7 +120,6 @@ fun EvaluacionFinalScreen(
                         textAlign = TextAlign.Center
                     )
 
-                    // Estadísticas
                     if (pet.diasEvaluados > 0) {
                         val promedioGeneral = (
                                 pet.sumaEnergia + pet.sumaHambre + pet.sumaSed +
@@ -166,17 +156,36 @@ fun EvaluacionFinalScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // Botón volver a empezar
                     Button(
-                        onClick = onVolverMenu,
+                        onClick = {
+                            onReiniciarJuego()
+                            onVolverMenu()
+                        },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = PurpleBtn),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = "Volver al menú",
+                            text = "🔄 Volver a empezar",
                             fontSize = 16.sp,
                             color = Color.White,
                             fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    // Botón volver al menú
+                    OutlinedButton(
+                        onClick = onVolverMenu,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                    ) {
+                        Text(
+                            text = "Volver al menú",
+                            fontSize = 15.sp,
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }

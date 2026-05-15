@@ -24,7 +24,6 @@ class PetPrefs(private val context: Context) {
     private val KEY_SEMANA = intPreferencesKey("semana_embarazo")
     private val KEY_DIA = intPreferencesKey("dia_embarazo")
 
-    // Keys para evaluación
     private val KEY_SUMA_ENERGIA = intPreferencesKey("suma_energia")
     private val KEY_SUMA_HAMBRE = intPreferencesKey("suma_hambre")
     private val KEY_SUMA_SED = intPreferencesKey("suma_sed")
@@ -40,9 +39,6 @@ class PetPrefs(private val context: Context) {
     private val EVENTO_20 = booleanPreferencesKey("evento_semana_20")
     private val EVENTO_36 = booleanPreferencesKey("evento_semana_36")
     private val KEY_DIA_CONSEJO = intPreferencesKey("dia_consejo_mostrado")
-
-
-
 
     val petFlow: Flow<Pet> = context.dataStore.data.map { prefs ->
         Pet(
@@ -106,7 +102,6 @@ class PetPrefs(private val context: Context) {
         }
     }
 
-    //comprueba si el evento ha sido visto
     suspend fun yaMostradoEvento(semana: Int): Boolean {
         val key = when (semana) {
             12 -> EVENTO_12
@@ -117,8 +112,6 @@ class PetPrefs(private val context: Context) {
         return context.dataStore.data.first()[key] ?: false
     }
 
-
-    //marcar el evento como visto
     suspend fun marcarEventoMostrado(semana: Int) {
         val key = when (semana) {
             12 -> EVENTO_12
@@ -141,5 +134,16 @@ class PetPrefs(private val context: Context) {
         }
     }
 
-
+    // Resetea todos los avisos y eventos para volver a empezar
+    suspend fun resetearAvisos() {
+        context.dataStore.edit { prefs ->
+            prefs[AVISO_T1] = false
+            prefs[AVISO_T2] = false
+            prefs[AVISO_T3] = false
+            prefs[EVENTO_12] = false
+            prefs[EVENTO_20] = false
+            prefs[EVENTO_36] = false
+            prefs[KEY_DIA_CONSEJO] = 0
+        }
+    }
 }

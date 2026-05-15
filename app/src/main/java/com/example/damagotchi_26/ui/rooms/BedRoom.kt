@@ -24,6 +24,8 @@ import com.example.damagotchi_26.domain.Pet
 import com.example.damagotchi_26.ui.Color.Color.PinkBg
 import com.example.damagotchi_26.ui.components.IconsPanel
 import com.example.damagotchi_26.ui.components.NightOverlay
+import com.example.damagotchi_26.ui.components.OverlyRooms.DormirOverlay
+import com.example.damagotchi_26.ui.components.OverlyRooms.SiestaOverlay
 import com.example.damagotchi_26.ui.theme.ActionButton
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 import kotlinx.coroutines.delay
@@ -36,8 +38,7 @@ fun BedRoom(
     pet: Pet,
     dormir: () -> Unit,
     siesta: () -> Unit,
-    dormirProgresivo: () -> Unit,
-    meditar: () -> Unit
+    sonidosActivados: Boolean = true
 ) {
     val vm: TransicionViewModel = viewModel()
     val momento by vm.momentoDia.collectAsState()
@@ -58,7 +59,7 @@ fun BedRoom(
                 alpha = 0.65f
                 repeat(2) {
                     delay(2000)
-                    dormirProgresivo()
+                    dormir()
                 }
                 alpha = 0f
                 delay(1200)
@@ -68,7 +69,7 @@ fun BedRoom(
                 alpha = 0.92f
                 repeat(5) {
                     delay(2500)
-                    dormirProgresivo()
+                    dormir()
                 }
                 alpha = 0f
                 delay(1200)
@@ -140,59 +141,10 @@ fun BedRoom(
             }
 
             // Overlay SIESTA
-            if (tipoDescanso == TipoDescanso.SIESTA && alphaAnimado > 0f) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFFFFD080).copy(alpha = alphaAnimado))
-                        .zIndex(20f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (alphaAnimado > 0.3f) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text(text = "☀️", fontSize = 44.sp)
-                            Text(
-                                text = "Echando una siesta...",
-                                fontSize = 20.sp,
-                                color = Color(0xFF5A3A00),
-                                fontWeight = FontWeight.Medium,
-                                textAlign = TextAlign.Center
-                            )
-                            Text(text = "😴", fontSize = 44.sp)
-                        }
-                    }
-                }
-            }
+            SiestaOverlay(alphaAnimado = if (tipoDescanso == TipoDescanso.SIESTA) alphaAnimado else 0f)
 
             // Overlay DORMIR
-            if (tipoDescanso == TipoDescanso.DORMIR && alphaAnimado > 0f) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFF0A0A2A).copy(alpha = alphaAnimado))
-                        .zIndex(20f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (alphaAnimado > 0.5f) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Text(text = "🌙 ✨ ⭐ ✨ 🌙", fontSize = 32.sp)
-                            Text(
-                                text = "Durmiendo...",
-                                fontSize = 22.sp,
-                                color = Color.White.copy(alpha = 0.85f),
-                                fontWeight = FontWeight.Light
-                            )
-                            Text(text = "💤", fontSize = 48.sp)
-                        }
-                    }
-                }
-            }
+            DormirOverlay(alphaAnimado = if (tipoDescanso == TipoDescanso.DORMIR) alphaAnimado else 0f)
 
             // Dialogo de eleccion
             if (mostrarDialogo) {

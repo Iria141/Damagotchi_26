@@ -4,7 +4,6 @@ package com.example.damagotchi_26.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.damagotchi_26.data.PetPrefs
-import com.example.damagotchi_26.data.TimeConfig
 import com.example.damagotchi_26.domain.MomentoDia
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -179,6 +178,22 @@ class TransicionViewModel (
             prefs.marcarConsejoDia(dia)
         }
     }
+
+    fun resetearTodo() {
+        _perdidaEmbarazo.value = false
+        _perdidaDefinitiva.value = false
+        diasCriticosConsecutivos = 0
+        vecesPerdida = 0
+        ultimaSemanaAvisada = null
+        _diaActual.value = 1
+        _momentoDia.value = MomentoDia.DIA
+
+        // Resetea los avisos de trimestre en PetPrefs
+        viewModelScope.launch {
+            petPrefs?.resetearAvisos()
+        }
+    }
+
 
 }
 

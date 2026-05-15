@@ -1,5 +1,6 @@
 package com.example.damagotchi_26.ui.rooms
 
+import android.media.MediaPlayer
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -12,6 +13,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,14 +36,33 @@ data class Burbuja(
 
 @Composable
 fun DuchaOverlay(
+    sonidosActivados: Boolean = true,
     onCompletado: () -> Unit,
     onCancelar: () -> Unit
 ) {
+    val context = LocalContext.current
     val density = LocalDensity.current
     var progreso by remember { mutableStateOf(0f) }
     var esponjaPos by remember { mutableStateOf(Offset(400f, 600f)) }
     val burbujas = remember { mutableStateListOf<Burbuja>() }
     var completado by remember { mutableStateOf(false) }
+
+    val mediaPlayer = remember {
+        MediaPlayer.create(context, R.raw.agua).apply {
+            isLooping = true
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (sonidosActivados) mediaPlayer.start()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (mediaPlayer.isPlaying) mediaPlayer.stop()
+            mediaPlayer.release()
+        }
+    }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -59,8 +80,6 @@ fun DuchaOverlay(
     }
 
     Box(modifier = Modifier.fillMaxSize().zIndex(50f)) {
-
-        // Área de arrastre transparente
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -88,7 +107,6 @@ fun DuchaOverlay(
                 }
         )
 
-        // Burbujas
         Canvas(modifier = Modifier.fillMaxSize()) {
             burbujas.forEach { b ->
                 drawCircle(color = Color.White.copy(alpha = b.alpha * 0.75f), radius = b.radio, center = Offset(b.x, b.y))
@@ -96,7 +114,6 @@ fun DuchaOverlay(
             }
         }
 
-        // Esponja siguiendo el dedo exacto con IntOffset en px
         Image(
             painter = painterResource(R.drawable.esponja),
             contentDescription = "Esponja",
@@ -110,7 +127,6 @@ fun DuchaOverlay(
                 }
         )
 
-        // Barra de progreso
         Column(
             modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp).padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally

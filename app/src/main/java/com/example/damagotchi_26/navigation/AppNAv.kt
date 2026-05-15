@@ -134,8 +134,6 @@ fun AppNav(
             RoomsPagerScreen(
                 transicionViewModel = transicionViewModel,
                 petViewModel = petViewModel,
-                momentoDia = momentoDia,
-                nombre = userProfile?.nombre ?: "Usuario",
                 rol = userProfile?.rol ?: "Otro",
                 onVolverMenu = {
                     navController.navigate(Route.Menu.path) {

@@ -31,7 +31,8 @@ private enum class AccionSalon { NINGUNA, PIANO, PINTAR }
 fun LivingRoom(
     pet: Pet,
     tocarPiano: () -> Unit,
-    pintar: () -> Unit
+    pintar: () -> Unit,
+    sonidosActivados: Boolean = true
 ) {
     val vm: TransicionViewModel = viewModel()
     val momento by vm.momentoDia.collectAsState()

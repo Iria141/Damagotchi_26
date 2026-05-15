@@ -32,7 +32,8 @@ fun Kitchen(
     pet: Pet,
     comer: () -> Unit,
     beber: () -> Unit,
-    prepararComida: () -> Unit
+    prepararComida: () -> Unit,
+    sonidosActivados: Boolean = true
 ) {
     val vm: TransicionViewModel = viewModel()
     val momento by vm.momentoDia.collectAsState()

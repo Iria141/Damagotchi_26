@@ -29,11 +29,11 @@ private enum class AccionBano { NINGUNA, DUCHA, BANO, DIENTES, CREMA }
 @Composable
 fun BathRoom(
     pet: Pet,
-    limpieza: () -> Unit,
-    irAlBano: () -> Unit,
+    bano: () -> Unit,
     ducharse: () -> Unit,
     lavarDientes: () -> Unit,
-    cuidarPiel: () -> Unit
+    cuidarPiel: () -> Unit,
+    sonidosActivados: Boolean = true
 ) {
     val vm: TransicionViewModel = viewModel()
     val momento by vm.momentoDia.collectAsState()
@@ -143,7 +143,7 @@ fun BathRoom(
             if (accionActiva == AccionBano.BANO) {
                 BanoOverlay (
                     onCompletado = {
-                        irAlBano()
+                        bano()
                         accionActiva = AccionBano.NINGUNA
                     }
                 )

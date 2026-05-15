@@ -1,5 +1,6 @@
 package com.example.damagotchi_26.ui.components.OverlyRooms
 
+import android.media.MediaPlayer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,20 +24,39 @@ import kotlin.math.roundToInt
 
 @Composable
 fun CaminarOverlay(
+    sonidosActivados: Boolean = true,
     onCompletado: () -> Unit
 ) {
+    val context = LocalContext.current
     val density = LocalDensity.current
+
+    val mediaPlayer = remember {
+        MediaPlayer.create(context, R.raw.pasos).apply {
+            isLooping = true
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (sonidosActivados) mediaPlayer.start()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (mediaPlayer.isPlaying) mediaPlayer.stop()
+            mediaPlayer.release()
+        }
+    }
+
     var posX by remember { mutableStateOf(100f) }
     var haciaDerecha by remember { mutableStateOf(true) }
-    var frameAnda by remember { mutableStateOf(true) } // alterna camina/para
+    var frameAnda by remember { mutableStateOf(true) }
     var progreso by remember { mutableStateOf(0f) }
     var completado by remember { mutableStateOf(false) }
 
-    val duracionTotal = 8000L // 8 segundos
-    val velocidad = 8f        // px por tick
-    val tickMs = 50L          // cada 50ms mueve
+    val duracionTotal = 8000L
+    val velocidad = 8f
+    val tickMs = 50L
 
-    // Selecciona el drawable según dirección y frame
     val drawable = when {
         haciaDerecha && frameAnda -> R.drawable.camina_dcha
         haciaDerecha && !frameAnda -> R.drawable.para_dcha
@@ -50,30 +71,20 @@ fun CaminarOverlay(
         }
     }
 
-    // Bucle de movimiento
     LaunchedEffect(Unit) {
         var tiempoTranscurrido = 0L
         var frameCounter = 0
-
         while (tiempoTranscurrido < duracionTotal) {
             delay(tickMs)
             tiempoTranscurrido += tickMs
             progreso = tiempoTranscurrido / duracionTotal.toFloat()
-
-            // Alterna frame cada 250ms (5 ticks)
             frameCounter++
-            if (frameCounter % 5 == 0) {
-                frameAnda = !frameAnda
-            }
-
-            // Mueve personaje
+            if (frameCounter % 5 == 0) frameAnda = !frameAnda
             posX += if (haciaDerecha) velocidad else -velocidad
         }
-
         completado = true
     }
 
-    // Detecta bordes y cambia dirección
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -84,18 +95,16 @@ fun CaminarOverlay(
         val altoPx = with(density) { maxHeight.toPx() }
         val tamPersonajePx = with(density) { 300.dp.toPx() }
 
-        // Comprueba bordes
         LaunchedEffect(posX) {
             if (posX > anchoPx - tamPersonajePx) {
                 haciaDerecha = false
-                frameAnda = false // para_dcha al girar
+                frameAnda = false
             } else if (posX < 0f) {
                 haciaDerecha = true
-                frameAnda = false // para_izq al girar
+                frameAnda = false
             }
         }
 
-        // Personaje caminando
         Image(
             painter = painterResource(drawable),
             contentDescription = "Personaje caminando",
@@ -109,7 +118,6 @@ fun CaminarOverlay(
                 }
         )
 
-        // Progreso y texto
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
