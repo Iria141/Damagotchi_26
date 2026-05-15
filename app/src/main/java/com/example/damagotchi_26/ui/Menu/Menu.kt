@@ -151,7 +151,7 @@ fun Menu(
                         )
                         if (pet != null) {
                             Text(
-                                text = "Semana $semanaReal · $trimestreTexto",
+                                text = "Semana $semanaReal",
                                 fontSize = 15.sp,
                                 color = PurpleBlueText.copy(alpha = 0.65f)
                             )

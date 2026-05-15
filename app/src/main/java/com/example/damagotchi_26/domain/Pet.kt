@@ -8,8 +8,8 @@ data class Pet(
     val actividad: Int = 100,
     val descanso : Int = 100,
 
-    val semanaEmbarazo: Int = 1, //1..200
-    val diaEmbarazo: Int = 1, //1..40,
+    val semanaEmbarazo: Int = 1, //1..40,
+    val diaEmbarazo: Int = 1,
 
     val sumaEnergia: Int = 0,
     val sumaHambre: Int = 0,

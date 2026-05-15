@@ -7,9 +7,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.damagotchi_26.ui.Color.Color.PinkBg
 import com.example.damagotchi_26.domain.MomentoDia
+import com.example.damagotchi_26.ui.Color.Color.PurpleBtn
 import com.example.damagotchi_26.ui.rooms.BathRoom
 import com.example.damagotchi_26.ui.rooms.BedRoom
 import com.example.damagotchi_26.ui.rooms.EvaluacionFinalScreen
@@ -213,7 +215,10 @@ private fun RoomDots(total: Int, current: Int, modifier: Modifier = Modifier) {
                 // usando Surface para puntitos
                 Surface(
                     shape = MaterialTheme.shapes.small,
-                    color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                    color = if (selected)
+                        PurpleBtn
+                    else
+                        Color.White,
                     modifier = Modifier.fillMaxSize()
                 ) {}
             }

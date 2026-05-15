@@ -1,0 +1,176 @@
+DAMAGOTCHI — Tu compañera de embarazo
+
+Damagotchi es una aplicación Android de cuidado prenatal inspirada en los Tamagotchi. El usuario
+cuida de una mascota virtual que refleja su bienestar durante el embarazo: alimentarla, hidratarla,
+descansar, hacer ejercicio y mantener la higiene son acciones que influyen directamente en el estado
+ de la criatura.
+
+
+## 📱 Tecnologías utilizadas
+
+- **Kotlin** — Lenguaje principal
+- **Jetpack Compose** — UI declarativa
+- **Firebase Authentication** — Login y registro de usuarios
+- **Firebase Firestore** — Base de datos en la nube (perfiles, publicaciones, anuncios)
+- **Firebase Cloud Messaging (FCM)** — Notificaciones push
+- **ViewModel + StateFlow** — Arquitectura MVVM
+- **Navigation Compose** — Navegación entre pantallas
+
+
+## 👤 Roles de usuario
+
+Al registrarse, cada usuario elige su rol. La experiencia de la app varía según el rol asignado:
+
+| Rol | Descripción |
+|-----|-------------|
+| ** Mamá ** | Acceso completo al cuidado del personaje, seguimiento del embarazo y comunidad |
+| ** Papá ** | Acompañamiento del proceso, acceso a la comunidad y seguimiento |
+| ** Otro ** | Perfil de apoyo general |
+| ** Admin ** | Puede crear anuncios informativos, moderar publicaciones y comentarios de la comunidad |
+
+
+## 🗂️ Estructura del proyecto
+
+```
+app/src/main/java/com/example/damagotchi_26/
+│
+├── data/               # Modelos de datos y acceso a Firebase
+│   ├── UserProfile.kt          # Perfil del usuario (nombre, rol, fecha última regla...)
+│   ├── PetPrefs.kt             # Persistencia del estado de la mascota
+│   └── MensajeFireBaseService.kt  # Servicio de notificaciones FCM
+│
+│
+├── domain/             # Lógica de negocio
+│   ├── Pet.kt                  # Estado de la mascota (hambre, sed, energía, limpieza...)
+│   ├── Trimestre.kt            # Enum: PRIMERO, SEGUNDO, TERCERO, FINAL, PERDIDA
+│   └── MomentoDia.kt           # Enum: DIA / NOCHE
+│
+├── navigation/         # Rutas de navegación
+│   ├── Route.kt                # Definición de todas las rutas
+│   └── AppNav.kt               # Grafo de navegación
+│
+├── repository/         # Repositorios de acceso a datos
+│
+├── ui/                 # Pantallas e interfaces
+│   ├── login/                  # Login, registro, recuperación de contraseña
+│   ├── rooms/                  # Habitaciones: baño, cocina, dormitorio, salón, parque
+│   ├── components/             # Componentes reutilizables y overlays de acciones
+│   ├── Community/              # Pantalla de comunidad y creación de posts
+│   ├── MiEmbarazo/             # Seguimiento del embarazo y anuncios
+│   ├── evaluacion/             # Evaluación final del embarazo
+│   └── Menu/                   # Menú principal
+│
+└── viewmodel/          # ViewModels (MVVM)
+    ├── PetViewModel.kt         # Control de medidores y tiempo de embarazo
+    ├── CommunityViewModel.kt   # Lógica de comunidad
+    └── SeguimientoViewModel.kt # Seguimiento médico
+
+## 🤰 Mecánica del personaje
+
+La mascota tiene ** 6 medidores ** que bajan con el tiempo y suben al realizar acciones:
+
+| Medidor | Acciones para subirlo |
+|---------|----------------------|
+| Hambre | Comer |
+| Sed | Beber agua |
+| Energía | Descansar, dormir, Pintar, Tocar piano, Hacer la comida |
+| Limpieza | Ducharse, Cepillarse, Bañarse, Crema corporal |
+| Actividad | Caminar, estirarmientos |
+| Descanso | Siesta, dormir |
+
+La personaje evoluciona visualmente a lo largo del embarazo según el **trimestre** (Cambio1,
+Cambio2, Cambio3) y muestra tres estados emocionales: feliz , superfeliz y triste.
+
+
+## 🏠 Habitaciones
+
+La app incluye 5 habitaciones navegables, cada una con acciones específicas:
+
+-  Cocina — Comer, beber agua
+-  Baño — Ducharse, lavarse los dientes, aplicar crema
+-  Dormitorio — Dormir, siesta
+-  Salón — Relajarse, actividades creativas (piano, pintar, puzzle)
+-  Parque — Caminar, estirarse
+
+
+## 🗓️ Sistema de embarazo
+
+El embarazo avanza en tiempo real simulado:
+
+- 155 minutos reales = 1 día ficticio del embarazo
+- Se divide en semanas y trimestres (1.º, 2.º, 3.º)
+- Al final del embarazo se muestra una evaluación basada en los cuidados acumulados
+- Existe una pantalla especial de pérdida del embarazoy un aviso antes de que esto suceda, si el
+usuario descuida su personaje
+
+
+## 👥 Comunidad
+
+Los usuarios pueden interactuar en una sección de comunidad:
+
+- Crear y leer publicaciones
+- Dejar comentarios y likes
+- El admin puede eliminar publicaciones de otros usuarios
+
+
+## 🔔 Notificaciones
+
+La app usa Firebase Cloud Messaging para enviar notificaciones push a los usuarios en las nuevas publicaciones
+de la comunidad y/o si estas son contestadas
+
+
+## ▶️ Ejecutar el proyecto en local (desarrolladores)
+Requisitos previos
+
+- Android Studio
+- JDK 17+
+- Cuenta en Firebase (con proyecto configurado)
+
+
+1. Clona el repositorio:
+
+bash $  git clone https://github.com/Iria141/Damagotchi_26.git
+
+Abre el proyecto en Android Studio.
+Añade el archivo google-services.json de tu proyecto Firebase en la carpeta app/.
+Sincroniza Gradle.
+Ejecuta en un emulador o dispositivo físico con Android 8.0 (API 26) o superior.
+
+
+## 🔐 Funcionalidades de autenticación
+
+- Inicio de sesión con email y contraseña (Firebase Auth)
+- Opción "Recuérdame"
+- Registro con nombre, fecha de nacimiento, rol, fecha de última regla y sexo del bebé.
+- Restablecimiento de contraseña por email
+
+
+## 📁 Estructura de datos en Firestore
+
+users/{uid}
+  - nombre, fechaNacimiento, rol, fechaUltimaRegla, sexoBebe, email
+
+posts/{postId}
+  - contenido, authorName, authorRole, type, likes...
+
+anuncios/{id}
+  - titulo, categoria, contenido, semanaGestacion, fuente, urlFuente
+
+
+🌐 Web oficial y descarga
+
+       https://iria141.github.io/damagotchi_web/
+
+Desde la web puedes descargar directamente el APK para instalar la app en cualquier dispositivo
+Android. Es gratuita y no requiere pasar por ninguna tienda de aplicaciones.
+
+                ⚠️ Al instalar, es posible que Android te pida activar
+                    "Orígenes desconocidos" en los ajustes de seguridad. ⚠️
+
+
+
+
+
+Proyecto desarrollado como proyecto de final de curso.
+
+                                                                Iria Calvo Blanco.
