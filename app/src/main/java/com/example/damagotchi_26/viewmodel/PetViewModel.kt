@@ -1,6 +1,5 @@
 package com.example.damagotchi_26.viewmodel
 
-import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.damagotchi_26.data.PetPrefs
@@ -13,10 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-/*
- * Hace que los medidores suban o bajen su porcentaje
- * Implementacion de la temporalizacion del embarazo.
- */
 class PetViewModel(
     private val prefs: PetPrefs
 ) : ViewModel() {
@@ -38,7 +33,6 @@ class PetViewModel(
         trabajoTick = viewModelScope.launch {
             while (true) {
                 delay(30_000)
-
                 val actual = pet.value
                 val actualizado = actual.copy(
                     hambre = limitar(actual.hambre - 2),
@@ -48,7 +42,6 @@ class PetViewModel(
                     limpieza = limitar(actual.limpieza - 1),
                     descanso = limitar(actual.descanso - 2)
                 )
-
                 prefs.guardar(actualizado)
             }
         }
@@ -58,18 +51,18 @@ class PetViewModel(
         actual.copy(
             hambre = limitar(actual.hambre + 25),
             energia = limitar(actual.energia + 15),
-            limpieza = limitar(actual.limpieza - 10),
-            actividad = limitar(actual.actividad - 5),
-            descanso = limitar(actual.descanso - 5)
+            limpieza = limitar(actual.limpieza - 5),
+            actividad = limitar(actual.actividad - 3),
+            descanso = limitar(actual.descanso - 3)
         )
     }
 
     fun hidratar() = actualizar { actual ->
         actual.copy(
-            sed = limitar(actual.sed + 15),
+            sed = limitar(actual.sed + 20),
             hambre = limitar(actual.hambre + 5),
             energia = limitar(actual.energia + 10),
-            limpieza = limitar(actual.limpieza - 5)
+            limpieza = limitar(actual.limpieza - 3)
         )
     }
 
@@ -77,39 +70,35 @@ class PetViewModel(
         actual.copy(
             energia = limitar(actual.energia + 10),
             actividad = limitar(actual.actividad + 8),
-            hambre = limitar(actual.hambre - 12) ,// cocinar da apetito
-            sed = limitar(actual.sed - 6),
-
-            )
+            hambre = limitar(actual.hambre - 5), // reducido de -12
+            sed = limitar(actual.sed - 3)         // reducido de -6
+        )
     }
-
 
     fun dormir() = actualizar { actual ->
         actual.copy(
-            descanso = limitar(actual.descanso + 30),
-            energia = limitar(actual.energia + 20),
-            hambre = limitar(actual.hambre - 10),
-            sed = limitar(actual.sed - 8)
+            descanso = limitar(actual.descanso + 45), // subido de +30
+            energia = limitar(actual.energia + 30),   // subido de +20
+            hambre = limitar(actual.hambre - 8),
+            sed = limitar(actual.sed - 6)
         )
     }
 
     fun siesta() = actualizar { actual ->
         actual.copy(
-            descanso = limitar(actual.descanso + 15),
-            energia = limitar(actual.energia + 10),
-            hambre = limitar(actual.hambre - 5),
-            sed = limitar(actual.sed - 3)
-
+            descanso = limitar(actual.descanso + 25), // subido de +15
+            energia = limitar(actual.energia + 15),   // subido de +10
+            hambre = limitar(actual.hambre - 3),
+            sed = limitar(actual.sed - 2)
         )
     }
-
 
     fun bano() = actualizar { actual ->
         actual.copy(
             energia = limitar(actual.energia + 15),
-            hambre = limitar(actual.hambre - 5),
+            hambre = limitar(actual.hambre - 3),
             limpieza = limitar(actual.limpieza + 20),
-            sed = limitar(actual.sed - 5)
+            sed = limitar(actual.sed - 3)
         )
     }
 
@@ -117,7 +106,7 @@ class PetViewModel(
         actual.copy(
             limpieza = limitar(actual.limpieza + 20),
             energia = limitar(actual.energia + 15),
-            sed = limitar(actual.sed - 5)
+            sed = limitar(actual.sed - 3)
         )
     }
 
@@ -134,20 +123,20 @@ class PetViewModel(
 
     fun caminar() = actualizar { actual ->
         actual.copy(
-            energia = limitar(actual.energia - 25),
-            hambre = limitar(actual.hambre - 15),
-            limpieza = limitar(actual.limpieza - 20),
-            sed = limitar(actual.sed - 20),
-            actividad = limitar(actual.actividad + 20)
+            energia = limitar(actual.energia - 12),  // reducido de -25
+            hambre = limitar(actual.hambre - 8),      // reducido de -15
+            limpieza = limitar(actual.limpieza - 10), // reducido de -20
+            sed = limitar(actual.sed - 10),            // reducido de -20
+            actividad = limitar(actual.actividad + 25) // subido de +20
         )
     }
 
     fun estirar() = actualizar { actual ->
         actual.copy(
-            energia = limitar(actual.energia - 10),
-            hambre = limitar(actual.hambre - 15),
-            sed = limitar(actual.sed - 15),
-            actividad = limitar(actual.actividad + 10)
+            energia = limitar(actual.energia - 5),   // reducido de -10
+            hambre = limitar(actual.hambre - 5),      // reducido de -15
+            sed = limitar(actual.sed - 5),             // reducido de -15
+            actividad = limitar(actual.actividad + 15) // subido de +10
         )
     }
 
@@ -161,9 +150,9 @@ class PetViewModel(
 
     fun jugarPelota() = actualizar { actual ->
         actual.copy(
-            actividad = limitar(actual.actividad + 12),
-            descanso = limitar(actual.descanso - 10),
-            energia = limitar(actual.energia - 15)
+            actividad = limitar(actual.actividad + 15), // subido de +12
+            descanso = limitar(actual.descanso - 8),    // reducido de -10
+            energia = limitar(actual.energia - 10)       // reducido de -15
         )
     }
 
@@ -186,7 +175,6 @@ class PetViewModel(
         )
     }
 
-    // Acumula medidores del día para la evaluación final
     fun acumularDia() = actualizar { actual ->
         actual.copy(
             sumaEnergia = actual.sumaEnergia + actual.energia,
@@ -207,7 +195,6 @@ class PetViewModel(
 
     fun iniciarTiempo() {
         if (trabajoTiempo != null) return
-
         trabajoTiempo = viewModelScope.launch {
             while (true) {
                 delay(10_000L)
@@ -219,11 +206,9 @@ class PetViewModel(
     private fun avanzarDia() = actualizar { actual ->
         val nuevoDia = (actual.diaEmbarazo + 1).coerceAtMost(280)
         val nuevaSemana = ((nuevoDia - 1) / 7) + 1
-
         actual.copy(
             diaEmbarazo = nuevoDia,
             semanaEmbarazo = nuevaSemana.coerceAtMost(40),
-
             sumaEnergia = actual.sumaEnergia + actual.energia,
             sumaHambre = actual.sumaHambre + actual.hambre,
             sumaSed = actual.sumaSed + actual.sed,
@@ -256,8 +241,6 @@ class PetViewModel(
             prefs.guardar(petInicial)
         }
     }
-
-
 
     private fun actualizar(bloque: (Pet) -> Pet) {
         viewModelScope.launch {
