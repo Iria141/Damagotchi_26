@@ -22,7 +22,7 @@ import com.example.damagotchi_26.ui.components.IconsPanel
 import com.example.damagotchi_26.ui.components.NightOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.CaminarOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.PelotaOverlay
-import com.example.damagotchi_26.ui.theme.ActionButton
+import com.example.damagotchi_26.ui.components.ActionButton
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 
 private enum class AccionParque { NINGUNA, CAMINAR, ESTIRAR, PELOTA }

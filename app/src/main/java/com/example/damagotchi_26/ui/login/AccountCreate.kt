@@ -30,31 +30,29 @@ fun AccountCreated(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 40.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    AuthInfoBox(
-                        text = "Su cuenta ha sido creada con éxito."
-                    )
-                }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AuthInfoBox(
+                    text = "Su cuenta ha sido creada con éxito."
+                )
+            }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
 
-                    Button(
-                        onClick = onGoLogin,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 90.dp)
-                    ) {
-                        Text("Inicio")
-                    }
+            Button(
+                onClick = onGoLogin,
+                modifier = Modifier.fillMaxWidth(0.6f)
+            ) {
+                Text("Inicio")
             }
         }
     }
+}
 
 
 @Preview(showBackground = true, showSystemUi = true)

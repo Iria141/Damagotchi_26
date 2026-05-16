@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -20,7 +19,7 @@ import com.example.damagotchi_26.ui.Color.Color.PinkBg
 import com.example.damagotchi_26.ui.components.IconsPanel
 import com.example.damagotchi_26.ui.components.NightOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.BanoOverlay
-import com.example.damagotchi_26.ui.theme.ActionButton
+import com.example.damagotchi_26.ui.components.ActionButton
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 
 private enum class AccionBano { NINGUNA, DUCHA, BANO, DIENTES, CREMA }
@@ -87,9 +86,9 @@ fun BathRoom(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .padding(20.dp)
+                    .padding(horizontal = 8.dp, vertical = 16.dp)
                     .zIndex(10f),
-                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ActionButton(

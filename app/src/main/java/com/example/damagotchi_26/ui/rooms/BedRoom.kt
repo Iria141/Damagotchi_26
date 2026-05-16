@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -26,7 +25,7 @@ import com.example.damagotchi_26.ui.components.IconsPanel
 import com.example.damagotchi_26.ui.components.NightOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.DormirOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.SiestaOverlay
-import com.example.damagotchi_26.ui.theme.ActionButton
+import com.example.damagotchi_26.ui.components.ActionButton
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 import kotlinx.coroutines.delay
 

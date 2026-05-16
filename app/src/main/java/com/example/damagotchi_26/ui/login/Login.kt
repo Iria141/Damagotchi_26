@@ -167,8 +167,8 @@ fun Login(
                         }
                     },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 90.dp)
+                        .fillMaxWidth(0.6f)
+                        .align(Alignment.CenterHorizontally)
                 ) {
                     Text("Iniciar Sesión")
                 }

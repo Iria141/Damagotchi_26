@@ -11,6 +11,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.damagotchi_26.domain.Pet
 import androidx.compose.foundation.Image
+import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import com.example.damagotchi_26.R
@@ -121,68 +123,76 @@ fun IconsPanel(
                 .graphicsLayer { translationX = offsetX }
         )
 
-        Column(
-            modifier = modifier
-                .width(90.dp)
-                .padding(vertical = 190.dp),
-            verticalArrangement = Arrangement.spacedBy(22.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize()
         ) {
+            val altoDisponible = maxHeight
+            Column(
+                modifier = modifier
+                    .width(90.dp)
+                    .height(altoDisponible)
+                    .padding(top = (altoDisponible * 0.22f)),
+                verticalArrangement = Arrangement.spacedBy(
+                    (altoDisponible * 0.04f).coerceIn(8.dp, 22.dp)
+                ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            MedidorIcono(
-                icono = R.drawable.trueno,
-                valor = pet.energia,
-                activo = medidorActivo == Medidor.ENERGIA,
-                onToggle = {
-                    medidorActivo = if (medidorActivo == Medidor.ENERGIA) null else Medidor.ENERGIA
-                }
-            )
+                MedidorIcono(
+                    icono = R.drawable.trueno,
+                    valor = pet.energia,
+                    activo = medidorActivo == Medidor.ENERGIA,
+                    onToggle = {
+                        medidorActivo = if (medidorActivo == Medidor.ENERGIA) null else Medidor.ENERGIA
+                    }
+                )
 
-            MedidorIcono(
-                icono = R.drawable.comida,
-                valor = pet.hambre,
-                activo = medidorActivo == Medidor.HAMBRE,
-                onToggle = {
-                    medidorActivo = if (medidorActivo == Medidor.HAMBRE) null else Medidor.HAMBRE
-                }
-            )
+                MedidorIcono(
+                    icono = R.drawable.comida,
+                    valor = pet.hambre,
+                    activo = medidorActivo == Medidor.HAMBRE,
+                    onToggle = {
+                        medidorActivo = if (medidorActivo == Medidor.HAMBRE) null else Medidor.HAMBRE
+                    }
+                )
 
-            MedidorIcono(
-                icono = R.drawable.agua,
-                valor = pet.sed,
-                activo = medidorActivo == Medidor.SED,
-                onToggle = {
-                    medidorActivo = if (medidorActivo == Medidor.SED) null else Medidor.SED
-                }
-            )
+                MedidorIcono(
+                    icono = R.drawable.agua,
+                    valor = pet.sed,
+                    activo = medidorActivo == Medidor.SED,
+                    onToggle = {
+                        medidorActivo = if (medidorActivo == Medidor.SED) null else Medidor.SED
+                    }
+                )
 
-            MedidorIcono(
-                icono = R.drawable.ducha,
-                valor = pet.limpieza,
-                activo = medidorActivo == Medidor.HIGIENE,
-                onToggle = {
-                    medidorActivo = if (medidorActivo == Medidor.HIGIENE) null else Medidor.HIGIENE
-                }
-            )
+                MedidorIcono(
+                    icono = R.drawable.ducha,
+                    valor = pet.limpieza,
+                    activo = medidorActivo == Medidor.HIGIENE,
+                    onToggle = {
+                        medidorActivo = if (medidorActivo == Medidor.HIGIENE) null else Medidor.HIGIENE
+                    }
+                )
 
-            MedidorIcono(
-                icono = R.drawable.actividad,
-                valor = pet.actividad,
-                activo = medidorActivo == Medidor.ACTIVIDAD,
-                onToggle = {
-                    medidorActivo =
-                        if (medidorActivo == Medidor.ACTIVIDAD) null else Medidor.ACTIVIDAD
-                }
-            )
+                MedidorIcono(
+                    icono = R.drawable.actividad,
+                    valor = pet.actividad,
+                    activo = medidorActivo == Medidor.ACTIVIDAD,
+                    onToggle = {
+                        medidorActivo =
+                            if (medidorActivo == Medidor.ACTIVIDAD) null else Medidor.ACTIVIDAD
+                    }
+                )
 
-            MedidorIcono(
-                icono = R.drawable.dormir,
-                valor = pet.descanso,
-                activo = medidorActivo == Medidor.SUEÑO,
-                onToggle = {
-                    medidorActivo = if (medidorActivo == Medidor.SUEÑO) null else Medidor.SUEÑO
-                }
-            )
+                MedidorIcono(
+                    icono = R.drawable.dormir,
+                    valor = pet.descanso,
+                    activo = medidorActivo == Medidor.SUEÑO,
+                    onToggle = {
+                        medidorActivo = if (medidorActivo == Medidor.SUEÑO) null else Medidor.SUEÑO
+                    }
+                )
+            }
         }
     }
 }
@@ -222,6 +232,44 @@ private fun MedidorIcono(
                         .clip(RoundedCornerShape(999.dp))
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun ActionButton(
+    image: Int,
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .height(68.dp)
+            .widthIn(min = 56.dp, max = 80.dp),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 2.dp,
+        shadowElevation = 3.dp,
+        onClick = onClick,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Image(
+                painter = painterResource(id = image),
+                contentDescription = null,
+                modifier = Modifier.size(26.dp)
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelSmall,
+                maxLines = 1
+            )
         }
     }
 }

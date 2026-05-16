@@ -114,9 +114,7 @@ fun ResetPassword(
                         }
                     },
                     enabled = email.isNotBlank(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 100.dp)
+                    modifier = Modifier.fillMaxWidth(0.6f)
                 ) {
                     Text("Enviar email")
                 }

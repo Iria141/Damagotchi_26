@@ -381,8 +381,8 @@ fun NewUser(
                         }
                     },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 100.dp)
+                        .fillMaxWidth(0.6f)
+                        .align(Alignment.CenterHorizontally)
                 ) {
                     Text("Crear cuenta")
                 }

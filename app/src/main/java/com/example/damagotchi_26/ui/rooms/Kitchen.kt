@@ -21,7 +21,7 @@ import com.example.damagotchi_26.ui.components.NightOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.ComerOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.BeberOverlay
 import com.example.damagotchi_26.ui.components.OverlyRooms.PreparacionOverlay
-import com.example.damagotchi_26.ui.theme.ActionButton
+import com.example.damagotchi_26.ui.components.ActionButton
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
 
 private enum class AccionCocina { NINGUNA, COMER, BEBER, INGREDIENTES }
