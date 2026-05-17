@@ -13,9 +13,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.damagotchi_26.R
-import com.example.damagotchi_26.domain.MomentoDia
 import com.example.damagotchi_26.ui.Color.Color.PinkBg
 import com.example.damagotchi_26.ui.Color.Color.PurpleBtn
+import com.example.damagotchi_26.ui.components.EcografiaDialog
+import com.example.damagotchi_26.ui.components.TrimestreDialog
 import com.example.damagotchi_26.ui.evaluacion.PerdidaDefinitivaScreen
 import com.example.damagotchi_26.ui.evaluacion.PerdidaEmbarazoScreen
 import com.example.damagotchi_26.ui.rooms.BathRoom
@@ -26,9 +27,10 @@ import com.example.damagotchi_26.ui.rooms.LivingRoom
 import com.example.damagotchi_26.ui.rooms.Park
 import com.example.damagotchi_26.viewmodel.PetViewModel
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
+import com.example.damagotchi_26.viewmodel.AvisoTrimestre
+import com.example.damagotchi_26.data.EventoEspecial
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,16 +40,16 @@ fun RoomsPagerScreen(
     rol: String,
     onVolverMenu: () -> Unit = {}
 ) {
-    val petEstado by petViewModel.pet.collectAsState(initial = null)
-    val perdidaEmbarazo by transicionViewModel.perdidaEmbarazo.collectAsState()
+    val petEstado         by petViewModel.pet.collectAsState(initial = null)
+    val perdidaEmbarazo   by transicionViewModel.perdidaEmbarazo.collectAsState()
     val perdidaDefinitiva by transicionViewModel.perdidaDefinitiva.collectAsState()
+    val eventoEcografia: EventoEspecial? by transicionViewModel.eventoConImagen.collectAsState()
+    val avisoTrimestre: AvisoTrimestre? by transicionViewModel.avisoTrimestre.collectAsState()
 
-    // Un único estado controla qué pantalla especial mostrar
-    var mostrarEvaluacion by remember { mutableStateOf(false) }
+    var mostrarEvaluacion        by remember { mutableStateOf(false) }
     var mostrarPerdidaDefinitiva by remember { mutableStateOf(false) }
 
-    // Preferencias de audio
-    var musicaActivada by remember { mutableStateOf(true) }
+    var musicaActivada   by remember { mutableStateOf(true) }
     var sonidosActivados by remember { mutableStateOf(true) }
 
     val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -55,7 +57,7 @@ fun RoomsPagerScreen(
         if (uid == null) return@LaunchedEffect
         FirebaseFirestore.getInstance().collection("users").document(uid).get()
             .addOnSuccessListener { doc ->
-                musicaActivada = doc.getBoolean("musica_activada") ?: true
+                musicaActivada   = doc.getBoolean("musica_activada")   ?: true
                 sonidosActivados = doc.getBoolean("sonidos_activados") ?: true
             }
     }
@@ -67,19 +69,18 @@ fun RoomsPagerScreen(
         return
     }
 
-    val pet = petEstado!!
+    val pet   = petEstado!!
     val rooms = listOf("Salón", "Cocina", "Dormitorio", "Baño", "Parque")
     val pagerState = rememberPagerState(pageCount = { rooms.size })
 
     LaunchedEffect(pet.semanaEmbarazo) {
         transicionViewModel.comprobarAvisoTrimestre(pet.semanaEmbarazo, rol = rol)
-        // Activa evaluación al llegar a semana 40
+        transicionViewModel.comprobarEventoEspecial(pet.semanaEmbarazo, rol = rol)
         if (pet.semanaEmbarazo >= 40 && !mostrarEvaluacion) {
             mostrarEvaluacion = true
         }
     }
 
-    // Detecta pérdida definitiva y la muestra solo una vez
     LaunchedEffect(perdidaDefinitiva) {
         if (perdidaDefinitiva && !mostrarPerdidaDefinitiva && !mostrarEvaluacion) {
             mostrarPerdidaDefinitiva = true
@@ -90,143 +91,133 @@ fun RoomsPagerScreen(
     LaunchedEffect(diaActual) {
         petViewModel.acumularDia()
         transicionViewModel.comprobarPerdida(
-            energia = pet.energia,
-            hambre = pet.hambre,
-            sed = pet.sed,
-            limpieza = pet.limpieza,
+            energia   = pet.energia,
+            hambre    = pet.hambre,
+            sed       = pet.sed,
+            limpieza  = pet.limpieza,
             actividad = pet.actividad,
-            descanso = pet.descanso
+            descanso  = pet.descanso
         )
     }
 
-    val snackbarHostState = remember { SnackbarHostState() }
-
     val context = LocalContext.current
     val mediaPlayer = remember {
-        MediaPlayer.create(context, R.raw.sergequadrado).apply {
-            isLooping = true
-        }
+        MediaPlayer.create(context, R.raw.sergequadrado).apply { isLooping = true }
     }
 
     LaunchedEffect(musicaActivada) {
-        if (musicaActivada) {
-            if (!mediaPlayer.isPlaying) mediaPlayer.start()
-        } else {
-            if (mediaPlayer.isPlaying) mediaPlayer.pause()
-        }
+        if (musicaActivada) { if (!mediaPlayer.isPlaying) mediaPlayer.start() }
+        else                { if (mediaPlayer.isPlaying)  mediaPlayer.pause()  }
     }
 
     DisposableEffect(Unit) {
-        onDispose {
-            mediaPlayer.stop()
-            mediaPlayer.release()
-        }
+        onDispose { mediaPlayer.stop(); mediaPlayer.release() }
     }
 
-    Scaffold(
-        containerColor = PinkBg,
-        snackbarHost = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 10.dp),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                SnackbarHost(hostState = snackbarHostState) { data ->
-                    Surface(
-                        tonalElevation = 4.dp,
-                        shadowElevation = 8.dp,
-                        shape = MaterialTheme.shapes.extraLarge,
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
-                    ) {
-                        Text(
-                            text = data.visuals.message,
-                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
-        }
-    ) { padding ->
+    Scaffold(containerColor = PinkBg) { _ ->
         Column(
             modifier = Modifier
                 .padding(top = 50.dp)
                 .fillMaxSize()
         ) {
-            // Semana y trimestre
             val trimestre = when (pet.semanaEmbarazo) {
-                in 1..12 -> "Primer trimestre"
+                in 1..12  -> "Primer trimestre"
                 in 13..27 -> "Segundo trimestre"
-                else -> "Tercer trimestre"
+                else      -> "Tercer trimestre"
             }
             Text(
-                text = "Semana ${pet.semanaEmbarazo} · $trimestre",
-                modifier = Modifier
+                text       = "Semana ${pet.semanaEmbarazo} · $trimestre",
+                modifier   = Modifier
                     .padding(bottom = 12.dp)
                     .fillMaxWidth(),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                fontSize = 18.sp,
-                color = PurpleBtn,
+                textAlign  = androidx.compose.ui.text.style.TextAlign.Center,
+                fontSize   = 18.sp,
+                color      = PurpleBtn,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             RoomDots(
-                total = rooms.size,
-                current = pagerState.currentPage,
+                total    = rooms.size,
+                current  = pagerState.currentPage,
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
             HorizontalPager(
-                state = pagerState,
+                state    = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (page) {
                     0 -> LivingRoom(
-                        pet = pet,
+                        pet              = pet,
                         sonidosActivados = sonidosActivados,
-                        tocarPiano = { petViewModel.tocarPiano() },
-                        pintar = { petViewModel.pintar() }
+                        tocarPiano       = { petViewModel.tocarPiano() },
+                        pintar           = { petViewModel.pintar() }
                     )
                     1 -> Kitchen(
-                        pet = pet,
+                        pet              = pet,
                         sonidosActivados = sonidosActivados,
-                        comer = { petViewModel.alimentar() },
-                        beber = { petViewModel.hidratar() },
-                        prepararComida = { petViewModel.prepararComida() }
+                        comer            = { petViewModel.alimentar() },
+                        beber            = { petViewModel.hidratar() },
+                        prepararComida   = { petViewModel.prepararComida() }
                     )
                     2 -> BedRoom(
-                        pet = pet,
+                        pet              = pet,
                         sonidosActivados = sonidosActivados,
-                        dormir = { petViewModel.dormir() },
-                        siesta = { petViewModel.siesta() },
+                        dormir           = { petViewModel.dormir() },
+                        siesta           = { petViewModel.siesta() }
                     )
                     3 -> BathRoom(
-                        pet = pet,
+                        pet              = pet,
                         sonidosActivados = sonidosActivados,
-                        bano = { petViewModel.bano() },
-                        ducharse = { petViewModel.ducharse() },
-                        lavarDientes = { petViewModel.lavarDientes() },
-                        cuidarPiel = { petViewModel.cuidarPiel() }
+                        bano             = { petViewModel.bano() },
+                        ducharse         = { petViewModel.ducharse() },
+                        lavarDientes     = { petViewModel.lavarDientes() },
+                        cuidarPiel       = { petViewModel.cuidarPiel() }
                     )
                     4 -> Park(
-                        pet = pet,
+                        pet              = pet,
                         sonidosActivados = sonidosActivados,
-                        caminar = { petViewModel.caminar() },
-                        estirar = { petViewModel.estirar() },
-                        jugarPelota = { petViewModel.jugarPelota() }
+                        caminar          = { petViewModel.caminar() },
+                        estirar          = { petViewModel.estirar() },
+                        jugarPelota      = { petViewModel.jugarPelota() }
                     )
                 }
             }
         }
     }
 
-    // Primera pérdida — aviso
+    if (avisoTrimestre != null
+        && eventoEcografia == null
+        && !perdidaEmbarazo
+        && !mostrarPerdidaDefinitiva
+        && !mostrarEvaluacion
+    ) {
+        TrimestreDialog(
+            titulo    = avisoTrimestre!!.titulo,
+            mensaje   = avisoTrimestre!!.mensaje,
+            semana    = avisoTrimestre!!.semana,
+            onDismiss = { transicionViewModel.descartarAvisoTrimestre() }
+        )
+    }
+
+    if (eventoEcografia != null
+        && !perdidaEmbarazo
+        && !mostrarPerdidaDefinitiva
+        && !mostrarEvaluacion
+    ) {
+        EcografiaDialog(
+            evento    = eventoEcografia!!,
+            rol       = rol,
+            onDismiss = {
+                transicionViewModel.descartarEventoImagen(eventoEcografia!!.semana)
+            }
+        )
+    }
+
     if (perdidaEmbarazo && !perdidaDefinitiva) {
         PerdidaEmbarazoScreen(
             onReintentar = {
@@ -237,23 +228,21 @@ fun RoomsPagerScreen(
         )
     }
 
-    // Pérdida definitiva — solo si no está ya mostrando evaluación
     if (mostrarPerdidaDefinitiva && !mostrarEvaluacion) {
         PerdidaDefinitivaScreen(
             onVerEvaluacion = {
                 mostrarPerdidaDefinitiva = false
-                mostrarEvaluacion = true
+                mostrarEvaluacion        = true
             }
         )
     }
 
-    // Evaluación final — única entrada
     if (mostrarEvaluacion) {
         EvaluacionFinalScreen(
-            pet = pet,
+            pet               = pet,
             perdidaDefinitiva = perdidaDefinitiva,
-            onVolverMenu = onVolverMenu,
-            onReiniciarJuego = {
+            onVolverMenu      = onVolverMenu,
+            onReiniciarJuego  = {
                 petViewModel.resetearJuego()
                 transicionViewModel.resetearTodo()
             }
@@ -264,9 +253,9 @@ fun RoomsPagerScreen(
 @Composable
 private fun RoomDots(total: Int, current: Int, modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier,
+        modifier              = modifier,
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment     = Alignment.CenterVertically
     ) {
         repeat(total) { index ->
             val selected = index == current
@@ -276,8 +265,8 @@ private fun RoomDots(total: Int, current: Int, modifier: Modifier = Modifier) {
                     .size(if (selected) 10.dp else 8.dp)
             ) {
                 Surface(
-                    shape = MaterialTheme.shapes.small,
-                    color = if (selected) PurpleBtn else Color.White,
+                    shape    = MaterialTheme.shapes.small,
+                    color    = if (selected) PurpleBtn else Color.White,
                     modifier = Modifier.fillMaxSize()
                 ) {}
             }

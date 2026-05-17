@@ -1,4 +1,4 @@
-package com.example.damagotchi_26.ui.theme
+package com.example.damagotchi_26.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,10 +20,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.damagotchi_26.navigation.Route
-import com.example.damagotchi_26.ui.components.AuthBackground
-import com.example.damagotchi_26.ui.components.AuthCard
-import com.example.damagotchi_26.ui.components.PrimaryAuthButton
 
 @Composable
 fun Welcome(

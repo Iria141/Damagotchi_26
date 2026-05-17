@@ -20,7 +20,7 @@ import com.example.damagotchi_26.ui.login.AccountCreated
 import com.example.damagotchi_26.ui.login.ResetPassword
 import com.example.damagotchi_26.data.UserProfile
 import com.example.damagotchi_26.data.saveUserProfile
-import com.example.damagotchi_26.ui.theme.Welcome
+import com.example.damagotchi_26.ui.components.Welcome
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
@@ -51,7 +51,7 @@ fun AppNav(
     var userProfile by remember { mutableStateOf<com.example.damagotchi_26.data.UserProfile?>(null) }
     val context = LocalContext.current
     val userPreferences = remember { UserPreferences(context) }
-    val welcomeSeen by userPreferences.welcomeSeenFlow.collectAsState(initial = false)
+    val welcomeSeen by userPreferences.welcomeSeenFlow.collectAsState(initial = null)
 
     NavHost(
         navController = navController,
@@ -80,8 +80,8 @@ fun AppNav(
                                     if (profile != null) {
                                         userProfile = profile
 
-                                        val destino = if (!welcomeSeen) {
-                                            Route.Menu.path
+                                        val destino = if (welcomeSeen == false) {
+                                            Route.Welcome.path
                                         } else {
                                             Route.Menu.path
                                         }

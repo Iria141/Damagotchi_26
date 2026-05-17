@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.damagotchi_26.data.PetPrefs
 import com.example.damagotchi_26.navigation.AppNav
+import com.example.damagotchi_26.repository.SeedCommunity
 import com.example.damagotchi_26.viewmodel.PetViewModel
 import com.example.damagotchi_26.viewmodel.PetViewModelFactory
 import com.example.damagotchi_26.viewmodel.TransicionViewModelFactory
@@ -36,7 +37,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Pedir permiso de notificaciones en Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this, Manifest.permission.POST_NOTIFICATIONS
@@ -46,7 +46,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Guardar token FCM en Firebase
         FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
             val uid = FirebaseAuth.getInstance().currentUser?.uid
             if (uid != null) {
@@ -56,6 +55,8 @@ class MainActivity : ComponentActivity() {
                     .update("fcmToken", token)
             }
         }
+
+        SeedCommunity.sembrar()
 
         setContent {
             val petPrefs = remember { PetPrefs(applicationContext) }
@@ -83,11 +84,11 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 Surface {
                     AppNav(
-                        startDestination = start,
-                        transicionViewModel = transicionViewModel,
-                        petViewModel = petViewModel,
-                        momentoDia = transicionViewModel.momentoDia,
-                        onRememberMeChanged = { value ->
+                        startDestination        = start,
+                        transicionViewModel     = transicionViewModel,
+                        petViewModel            = petViewModel,
+                        momentoDia              = transicionViewModel.momentoDia,
+                        onRememberMeChanged     = { value ->
                             userPrefs.setRememberMe(value)
                         }
                     )

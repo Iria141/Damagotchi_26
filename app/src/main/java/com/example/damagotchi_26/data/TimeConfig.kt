@@ -12,6 +12,5 @@ object TimeConfig {
     const val DIA_DEBUG = 1 * MINUTO       // 1 minuto en modo debug
     const val DIA_REAL = 155 * MINUTO      // 155 minutos en producción
 
-    val CICLO_LUZ get() = if (DEBUG) CICLO_LUZ_DEBUG else CICLO_LUZ_REAL
     val DIA get() = if (DEBUG) DIA_DEBUG else DIA_REAL
 }

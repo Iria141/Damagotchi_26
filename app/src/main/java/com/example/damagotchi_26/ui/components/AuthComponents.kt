@@ -2,6 +2,22 @@ package com.example.damagotchi_26.ui.components
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import androidx.compose.runtime.*
+import com.example.damagotchi_26.ui.Color.Color.BgHeader1
+import com.example.damagotchi_26.ui.Color.Color.BgHeader2
+import com.example.damagotchi_26.ui.Color.Color.BgSurface
+import com.example.damagotchi_26.ui.Color.Color.DividerClr
+import com.example.damagotchi_26.ui.Color.Color.TextPrimary
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.background
@@ -56,6 +72,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import com.example.damagotchi_26.data.Comment
+import com.example.damagotchi_26.data.EventoEspecial
 import com.example.damagotchi_26.repository.ComentarioRepository
 import com.example.damagotchi_26.repository.LikeRepository
 import com.example.damagotchi_26.ui.Color.Color.BorderGray
