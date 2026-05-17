@@ -99,6 +99,8 @@ El embarazo avanza en tiempo real simulado:
 
 - 155 minutos reales = 1 día ficticio del embarazo
 - Se divide en semanas y trimestres (1.º, 2.º, 3.º)
+- El sistema incorpora eventos especiales relacionados con cambios de trimestre y ecografías,
+reforzando la sensación de acompañamiento durante toda la experiencia.
 - Al final del embarazo se muestra una evaluación basada en los cuidados acumulados
 - Existe una pantalla especial de pérdida del embarazoy un aviso antes de que esto suceda, si el
 usuario descuida su personaje
@@ -110,7 +112,23 @@ Los usuarios pueden interactuar en una sección de comunidad:
 
 - Crear y leer publicaciones
 - Dejar comentarios y likes
-- El admin puede eliminar publicaciones de otros usuarios
+- El admin puede eliminar publicaciones de otros usuarios, y se diferencia con la etiqeuta ADMIN
+
+
+🤰 Seguimiento del embarazo
+
+La aplicación incorpora una sección de seguimiento adaptada a la etapa del embarazo del usuario.
+
+A través de un sistema de anuncios informativos almacenados en Firebase Firestore, la app muestra
+contenido relacionado con cada semana del embarazo, incluyendo recomendaciones, cambios físicos,
+salud prenatal y consejos útiles.
+El contenido se filtra automáticamente según la semana del embarazo del usuario e incluye:
+
+- Información adaptada a cada etapa.
+- Filtros por categorías
+- Sistema de favoritos
+- Búsqueda de contenido
+- Gestión de publicaciones por parte del administrador
 
 
 ## 🔔 Notificaciones

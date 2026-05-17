@@ -1,5 +1,5 @@
 object TimeConfig {
-    const val DEBUG = true // true para pruebas, false en producción
+    const val DEBUG = false // true para pruebas, false en producción
 
     const val SEGUNDO = 1_000L
     const val MINUTO = 60 * SEGUNDO
