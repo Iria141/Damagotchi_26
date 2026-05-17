@@ -27,7 +27,7 @@ import com.example.damagotchi_26.ui.rooms.LivingRoom
 import com.example.damagotchi_26.ui.rooms.Park
 import com.example.damagotchi_26.viewmodel.PetViewModel
 import com.example.damagotchi_26.viewmodel.TransicionViewModel
-import com.example.damagotchi_26.viewmodel.AvisoTrimestre
+import com.example.damagotchi_26.data.AvisoTrimestre
 import com.example.damagotchi_26.data.EventoEspecial
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -87,9 +87,9 @@ fun RoomsPagerScreen(
         }
     }
 
-    val diaActual by transicionViewModel.diaActual.collectAsState()
-    LaunchedEffect(diaActual) {
-        petViewModel.acumularDia()
+
+    LaunchedEffect(pet.diaEmbarazo) {
+        transicionViewModel.sincronizarDia(pet.diaEmbarazo)
         transicionViewModel.comprobarPerdida(
             energia   = pet.energia,
             hambre    = pet.hambre,
@@ -114,7 +114,7 @@ fun RoomsPagerScreen(
         onDispose { mediaPlayer.stop(); mediaPlayer.release() }
     }
 
-    Scaffold(containerColor = PinkBg) { _ ->
+    Scaffold(containerColor = PinkBg) { padding ->
         Column(
             modifier = Modifier
                 .padding(top = 50.dp)

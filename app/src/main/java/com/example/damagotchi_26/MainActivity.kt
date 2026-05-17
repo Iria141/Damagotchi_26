@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(Unit) {
                 petViewModel.iniciarTick()
-                petViewModel.iniciarTiempo()
+                petViewModel.sincronizarTiempoReal()
                 transicionViewModel.iniciarCicloLuz()
             }
 

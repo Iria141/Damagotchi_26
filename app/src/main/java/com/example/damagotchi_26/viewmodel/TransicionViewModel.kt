@@ -2,7 +2,7 @@ package com.example.damagotchi_26.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.damagotchi_26.data.EventoEspecial
+import com.example.damagotchi_26.data.AvisoTrimestre
 import com.example.damagotchi_26.data.PetPrefs
 import com.example.damagotchi_26.domain.MomentoDia
 import kotlinx.coroutines.Job
@@ -15,12 +15,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-data class AvisoTrimestre(
-    val semana: Int,
-    val titulo: String,
-    val mensaje: String
-)
-
 class TransicionViewModel(
     private val petPrefs: PetPrefs? = null
 ) : ViewModel() {
@@ -32,7 +26,7 @@ class TransicionViewModel(
     val diaActual: StateFlow<Int> = _diaActual
 
     val semanaActual: StateFlow<Int> =
-        diaActual.map { dia -> ((dia - 1) / 7) + 1 }
+        _diaActual.map { dia -> ((dia - 1) / 7) + 1 }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
@@ -55,53 +49,43 @@ class TransicionViewModel(
 
     private var diasCriticosConsecutivos = 0
     private var vecesPerdida = 0
-
     private var trabajoLuz: Job? = null
 
-    init {
-        iniciarCicloLuz()
-    }
+    init { iniciarCicloLuz() }
 
+    // ciclo dia y noche
+    // Solo cambia la luz — NO avanza el día. El día lo gestiona PetViewModel.
 
     fun iniciarCicloLuz() {
         if (trabajoLuz != null) return
         trabajoLuz = viewModelScope.launch {
             while (true) {
-                delay(tiempoLuz())
+                delay(TimeConfig.CICLO_LUZ)
                 _momentoDia.value =
                     if (_momentoDia.value == MomentoDia.DIA) MomentoDia.NOCHE
                     else MomentoDia.DIA
-                if (_momentoDia.value == MomentoDia.DIA) avanzarDia()
             }
         }
     }
 
-    private fun avanzarDia() {
-        _diaActual.value += 1
+    // Sincroniza el día visual con el día real del juego
+    fun sincronizarDia(dia: Int) {
+        _diaActual.value = dia
     }
 
-
     fun comprobarPerdida(
-        energia: Int,
-        hambre: Int,
-        sed: Int,
-        limpieza: Int,
-        actividad: Int,
-        descanso: Int
+        energia: Int, hambre: Int, sed: Int,
+        limpieza: Int, actividad: Int, descanso: Int
     ) {
-        val medidoresCriticos = listOf(energia, hambre, sed, limpieza, actividad, descanso)
+        val criticos = listOf(energia, hambre, sed, limpieza, actividad, descanso)
             .count { it <= 20 }
-
-        if (medidoresCriticos >= 3) {
+        if (criticos >= 3) {
             diasCriticosConsecutivos++
             if (diasCriticosConsecutivos >= 2) {
                 vecesPerdida++
                 diasCriticosConsecutivos = 0
-                if (vecesPerdida >= 2) {
-                    _perdidaDefinitiva.value = true
-                } else {
-                    _perdidaEmbarazo.value = true
-                }
+                if (vecesPerdida >= 2) _perdidaDefinitiva.value = true
+                else _perdidaEmbarazo.value = true
             }
         } else {
             diasCriticosConsecutivos = 0
@@ -113,7 +97,6 @@ class TransicionViewModel(
         diasCriticosConsecutivos = 0
     }
 
-
     fun comprobarAvisoTrimestre(semana: Int, rol: String) {
         val prefs = petPrefs ?: return
         viewModelScope.launch {
@@ -123,42 +106,28 @@ class TransicionViewModel(
                 28 -> com.example.damagotchi_26.domain.Trimestre.TERCERO to 28
                 else -> return@launch
             }
-
             if (prefs.yaMostradoAviso(umbral)) return@launch
-
             val texto = com.example.damagotchi_26.ui.theme
-                .mensajesDeInicio(trimestre, rol)
-                .firstOrNull() ?: return@launch
-
+                .mensajesDeInicio(trimestre, rol).firstOrNull() ?: return@launch
             val titulo = when (semana) {
                 1  -> "¡Bienvenida al juego!"
                 13 -> "Segundo trimestre"
                 28 -> "Tercer trimestre"
                 else -> "Nuevo trimestre"
             }
-
-            _avisoTrimestre.value = AvisoTrimestre(
-                semana  = semana,
-                titulo  = titulo,
-                mensaje = texto
-            )
+            _avisoTrimestre.value = AvisoTrimestre(semana = semana, titulo = titulo, mensaje = texto)
             prefs.marcarAvisoMostrado(umbral)
         }
     }
 
-    fun descartarAvisoTrimestre() {
-        _avisoTrimestre.value = null
-    }
-
+    fun descartarAvisoTrimestre() { _avisoTrimestre.value = null }
 
     fun comprobarEventoEspecial(semana: Int, rol: String) {
         val prefs = petPrefs ?: return
         viewModelScope.launch {
             if (prefs.yaMostradoEvento(semana)) return@launch
-
             val evento = com.example.damagotchi_26.ui.theme.EVENTOS_ESPECIALES
                 .firstOrNull { it.semana == semana } ?: return@launch
-
             _eventoConImagen.value = evento
         }
     }
@@ -170,8 +139,15 @@ class TransicionViewModel(
         }
     }
 
-
-
+    fun comprobarConsejoDelDia(semana: Int, dia: Int, rol: String) {
+        val prefs = petPrefs ?: return
+        viewModelScope.launch {
+            if (prefs.ultimoDiaConsejoMostrado() == dia) return@launch
+            val trimestre = com.example.damagotchi_26.ui.theme.trimestreDeSemana(semana)
+            com.example.damagotchi_26.ui.theme.consejoDelDia(trimestre, rol, dia) ?: return@launch
+            prefs.marcarConsejoDia(dia)
+        }
+    }
 
     fun resetearTodo() {
         _perdidaEmbarazo.value = false
@@ -184,10 +160,6 @@ class TransicionViewModel(
         _momentoDia.value = MomentoDia.DIA
         viewModelScope.launch { petPrefs?.resetearAvisos() }
     }
-
-    private fun tiempoLuz(): Long =
-        if (TimeConfig.DEBUG) TimeConfig.CICLO_LUZ_DEBUG
-        else TimeConfig.CICLO_LUZ_REAL
 
     override fun onCleared() {
         trabajoLuz?.cancel()

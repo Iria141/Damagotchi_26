@@ -1,27 +1,28 @@
 package com.example.damagotchi_26.data
 
-import kotlinx.coroutines.flow.first
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.damagotchi_26.domain.Pet
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore(name = "pet_prefs")
 
 class PetPrefs(private val context: Context) {
 
-    private val KEY_HAMBRE        = intPreferencesKey("hambre")
-    private val KEY_ENERGIA       = intPreferencesKey("energia")
-    private val KEY_DIVERSION     = intPreferencesKey("diversion")
-    private val KEY_SED           = intPreferencesKey("sed")
-    private val KEY_DESCANSO      = intPreferencesKey("dormir")
-    private val KEY_HIGIENE       = intPreferencesKey("limpieza")
-    private val KEY_SEMANA        = intPreferencesKey("semana_embarazo")
-    private val KEY_DIA           = intPreferencesKey("dia_embarazo")
+    private val KEY_HAMBRE         = intPreferencesKey("hambre")
+    private val KEY_ENERGIA        = intPreferencesKey("energia")
+    private val KEY_DIVERSION      = intPreferencesKey("diversion")
+    private val KEY_SED            = intPreferencesKey("sed")
+    private val KEY_DESCANSO       = intPreferencesKey("dormir")
+    private val KEY_HIGIENE        = intPreferencesKey("limpieza")
+    private val KEY_SEMANA         = intPreferencesKey("semana_embarazo")
+    private val KEY_DIA            = intPreferencesKey("dia_embarazo")
 
     private val KEY_SUMA_ENERGIA   = intPreferencesKey("suma_energia")
     private val KEY_SUMA_HAMBRE    = intPreferencesKey("suma_hambre")
@@ -31,9 +32,12 @@ class PetPrefs(private val context: Context) {
     private val KEY_SUMA_DESCANSO  = intPreferencesKey("suma_descanso")
     private val KEY_DIAS_EVALUADOS = intPreferencesKey("dias_evaluados")
 
-    private val AVISO_T1 = booleanPreferencesKey("aviso_trimestre_1")
-    private val AVISO_T2 = booleanPreferencesKey("aviso_trimestre_13")
-    private val AVISO_T3 = booleanPreferencesKey("aviso_trimestre_28")
+    // Marca de tiempo de inicio del juego (ms desde epoch)
+    private val KEY_FECHA_INICIO   = longPreferencesKey("fecha_inicio_juego")
+
+    private val AVISO_T1  = booleanPreferencesKey("aviso_trimestre_1")
+    private val AVISO_T2  = booleanPreferencesKey("aviso_trimestre_13")
+    private val AVISO_T3  = booleanPreferencesKey("aviso_trimestre_28")
 
     private val EVENTO_7  = booleanPreferencesKey("evento_semana_7")
     private val EVENTO_14 = booleanPreferencesKey("evento_semana_14")
@@ -82,6 +86,24 @@ class PetPrefs(private val context: Context) {
         }
     }
 
+//fecha inicio juego
+    suspend fun obtenerFechaInicio(): Long =
+        context.dataStore.data.first()[KEY_FECHA_INICIO] ?: 0L
+
+    suspend fun guardarFechaInicio(timestamp: Long) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_FECHA_INICIO] = timestamp
+        }
+    }
+
+    suspend fun resetearFechaInicio() {
+        context.dataStore.edit { prefs ->
+            prefs.remove(KEY_FECHA_INICIO)
+        }
+    }
+
+    //aviso trimestre
+
     suspend fun yaMostradoAviso(umbral: Int): Boolean {
         val key = when (umbral) {
             1  -> AVISO_T1
@@ -101,6 +123,8 @@ class PetPrefs(private val context: Context) {
         }
         context.dataStore.edit { prefs -> prefs[key] = true }
     }
+
+    //evento eco
 
     suspend fun yaMostradoEvento(semana: Int): Boolean {
         val key = when (semana) {
@@ -124,6 +148,7 @@ class PetPrefs(private val context: Context) {
         context.dataStore.edit { prefs -> prefs[key] = true }
     }
 
+
     suspend fun ultimoDiaConsejoMostrado(): Int =
         context.dataStore.data.first()[KEY_DIA_CONSEJO] ?: 0
 
@@ -131,16 +156,18 @@ class PetPrefs(private val context: Context) {
         context.dataStore.edit { prefs -> prefs[KEY_DIA_CONSEJO] = dia }
     }
 
+
     suspend fun resetearAvisos() {
         context.dataStore.edit { prefs ->
-            prefs[AVISO_T1]   = false
-            prefs[AVISO_T2]   = false
-            prefs[AVISO_T3]   = false
-            prefs[EVENTO_7]   = false
-            prefs[EVENTO_14]  = false
-            prefs[EVENTO_22]  = false
-            prefs[EVENTO_32]  = false
+            prefs[AVISO_T1]        = false
+            prefs[AVISO_T2]        = false
+            prefs[AVISO_T3]        = false
+            prefs[EVENTO_7]        = false
+            prefs[EVENTO_14]       = false
+            prefs[EVENTO_22]       = false
+            prefs[EVENTO_32]       = false
             prefs[KEY_DIA_CONSEJO] = 0
+            prefs.remove(KEY_FECHA_INICIO)
         }
     }
 }
